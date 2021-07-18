@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import Main from './pages/Main/Main';
+import TestForm from './pages/Test/TestForm';
 import GlobalStyle from './styles/GlobalStyle';
 import theme from './styles/theme';
 
@@ -12,6 +13,7 @@ const Routes = () => (
       <BrowserRouter>
         <Switch>
           <Route exact path="/" component={Main} />
+          <Route exact path="/test" component={TestForm} />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>
