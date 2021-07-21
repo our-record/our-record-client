@@ -64,7 +64,7 @@ const Information = () => {
 const InformationWrap = styled.div`
   ${flexSet('column', 'flex-start', 'center')}
   height: 100vh;
-  padding: 50px 0;
+  padding: 70px 0;
 `;
 
 const ContentsWrap = styled.div`
