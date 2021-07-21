@@ -14,7 +14,7 @@ export const flexSet = (
 export const buttonSet = (fontSize = '12px') => css`
   border: 1px solid rgb(220, 220, 220);
   border-radius: 3px;
-  color: rgb(120, 120, 120);
+  color: ${props => props.theme.basicDarkGray};
   background-color: white;
   font-size: ${fontSize};
   box-shadow: 1px 1px rgb(200, 200, 200);
@@ -54,11 +54,11 @@ export const bottomTableDataSet = () => css`
 export const textInputSet = (height = '18px') => css`
   height: ${height};
   border: ${props => props.theme.basicBorder};
-  color: ${props => props.theme.basicGray};
+  color: ${props => props.theme.basicDarkGray};
 
   &:focus {
-    border: none;
-    outline: 1px solid ${props => props.theme.keyColor};
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
   }
 `;
 
@@ -66,11 +66,11 @@ export const dateInputSet = (height = '18px') => css`
   height: ${height};
   appearance: none;
   border: ${props => props.theme.basicBorder};
-  color: ${props => props.theme.basicGray};
+  color: ${props => props.theme.basicDarkGray};
 
   &:focus {
-    border: none;
-    outline: 1px solid ${props => props.theme.keyColor};
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
   }
 
   ::-webkit-calendar-picker-indicator {
