@@ -1,6 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { buttonSet, flexSet } from '../../styles/mixin';
+import {
+  buttonSet,
+  flexSet,
+  textInputSet,
+  dateInputSet,
+} from '../../styles/mixin';
 
 const Information = () => {
   return (
@@ -104,19 +109,19 @@ const Label = styled.div`
   color: ${props => props.theme.basicDarkGray};
 `;
 const DateInput = styled.input`
-  height: 18px;
-  border: ${props => props.theme.basicBorder};
-  color: ${props => props.theme.basicDarkGray};
+  ${dateInputSet}
 `;
+
 const ProfileButton = styled.button`
   ${buttonSet}
 `;
+
 const NickNameWrap = styled.div`
   ${flexSet('row', 'flex-start', 'center')}
 `;
+
 const NickNameInput = styled.input`
-  height: 18px;
-  border: ${props => props.theme.basicBorder};
+  ${textInputSet}
 `;
 
 const TextCount = styled.div`
