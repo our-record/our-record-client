@@ -1,6 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { buttonSet, flexSet } from '../../styles/mixin';
+import {
+  tableSet,
+  tableHeadSet,
+  tableDataSet,
+  bottomTableDataSet,
+  buttonSet,
+  flexSet,
+} from '../../styles/mixin';
 
 const Main = () => {
   return (
@@ -209,33 +216,19 @@ const ListTitle = styled.div`
 `;
 
 const ListTable = styled.table`
-  width: 100%;
-  min-width: 700px;
-  border-right: hidden;
-  border-left: hidden;
-  font-size: 12px;
+  ${tableSet('100%')}
 `;
 
 const TableHead = styled.th`
-  padding: 7px 0;
-  color: ${props => props.theme.basicDarkGray};
-  background-color: ${props => props.theme.keyColor};
+  ${tableHeadSet}
 `;
 
 const TableData = styled.td`
-  padding: 3px 0;
-  border: ${props => props.theme.basicBorder};
-  color: ${props => props.theme.basicGray};
-  text-align: center;
-  vertical-align: middle;
+  ${tableDataSet}
 `;
 
 const BottomTableData = styled.td`
-  padding: 7px 0;
-  border: ${props => props.theme.basicBorder};
-  color: ${props => props.theme.basicGray};
-  text-align: center;
-  vertical-align: middle;
+  ${bottomTableDataSet}
 
   &.allDeleteButton {
     cursor: pointer;

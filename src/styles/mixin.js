@@ -20,3 +20,60 @@ export const buttonSet = (fontSize = '12px') => css`
   box-shadow: 1px 1px rgb(200, 200, 200);
   cursor: pointer;
 `;
+
+export const tableSet = (width = '100%') => css`
+  width: ${width};
+  margin-top: 30px;
+  border-right: hidden;
+  border-left: hidden;
+  font-size: 12px;
+`;
+
+export const tableHeadSet = () => css`
+  padding: 7px 0;
+  color: ${props => props.theme.basicDarkGray};
+  background-color: ${props => props.theme.keyColor};
+`;
+
+export const tableDataSet = () => css`
+  padding: 3px 0;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicGray};
+  text-align: center;
+  vertical-align: middle;
+`;
+
+export const bottomTableDataSet = () => css`
+  padding: 7px 0;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicGray};
+  text-align: center;
+  vertical-align: middle;
+`;
+
+export const textInputSet = (height = '18px') => css`
+  height: ${height};
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicGray};
+
+  &:focus {
+    border: none;
+    outline: 1px solid ${props => props.theme.keyColor};
+  }
+`;
+
+export const dateInputSet = (height = '18px') => css`
+  height: ${height};
+  appearance: none;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicGray};
+
+  &:focus {
+    border: none;
+    outline: 1px solid ${props => props.theme.keyColor};
+  }
+
+  ::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+  }
+`;
