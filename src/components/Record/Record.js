@@ -57,7 +57,7 @@ const Record = () => {
 const RecordWrap = styled.div`
   ${flexSet('row', 'center', 'center')}
   height: 100vh;
-  background-color: ${props => props.theme.basicGray};
+  background-color: rgba(120, 120, 120, 0.8);
 `;
 
 const ContentsWrap = styled.div`
