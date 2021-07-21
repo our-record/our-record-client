@@ -27,7 +27,7 @@ const Main = () => {
       </NavWrap>
       <BodyWrap>
         <SideWrap>
-          <ProfileImage alt="profile" src="/main/meongmoongs.png" />
+          <ProfileImage alt="profile" src="/images/main/meongmoongs.png" />
           <NickNameWrap>
             <span>훌라춤감자맘</span>
             <HeartIcon alt="heart" src="/icon/heart.png" />{' '}

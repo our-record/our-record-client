@@ -6,6 +6,7 @@ import Register from './pages/Register/Register';
 import Information from './pages/Information/Information';
 import Anniversary from './pages/Anniversary/Anniversary';
 import Record from './components/Record/Record.js';
+import Story from './components/Story/Story';
 import GlobalStyle from './styles/GlobalStyle';
 import TestForm from './pages/Test/TestForm';
 import theme from './styles/theme';
@@ -21,6 +22,7 @@ const Routes = () => (
           <Route exact path="/information" component={Information} />
           <Route exact path="/anniversary" component={Anniversary} />
           <Route exact path="/record" component={Record} />
+          <Route exact path="/story" component={Story} />
           <Route exact path="/test" component={TestForm} />
         </Switch>
       </BrowserRouter>
