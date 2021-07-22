@@ -28,8 +28,8 @@ const RegisterWrap = styled.div`
 `;
 
 const LoginWrap = styled.div`
-  width: 300px;
-  height: 300px;
+  width: 340px;
+  height: 340px;
   padding: 40px 20px;
   border: 2px solid rgb(100, 100, 100);
   text-align: center;
