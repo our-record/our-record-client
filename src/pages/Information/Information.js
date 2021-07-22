@@ -98,7 +98,10 @@ const CategoryTitle = styled.div`
   font-weight: bold;
 `;
 
-const InputWrap = styled.div``;
+const InputWrap = styled.div`
+  margin-bottom: 5px;
+`;
+
 const ListWrap = styled.div`
   ${flexSet('row', 'flex-start', 'center')}
   margin: 10px 0;
@@ -108,6 +111,7 @@ const Label = styled.div`
   width: 80px;
   color: ${props => props.theme.basicDarkGray};
 `;
+
 const DateInput = styled.input`
   ${dateInputSet}
 `;

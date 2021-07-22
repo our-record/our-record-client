@@ -60,6 +60,10 @@ export const textInputSet = (height = '18px') => css`
     border: 1px solid ${props => props.theme.keyColor};
     outline: none;
   }
+
+  ::placeholder {
+    color: ${props => props.theme.basicGray};
+  }
 `;
 
 export const dateInputSet = (height = '18px') => css`
