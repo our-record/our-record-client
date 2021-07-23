@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import kakaoLogin from './kakaoLogin';
 import { flexSet } from '../../styles/mixin';
 
 const Register = () => {
@@ -8,7 +9,11 @@ const Register = () => {
       <LoginWrap>
         <MainTitle>Our Record</MainTitle>
         <SubTitle>둘 만의 소중한 순간을 기록하세요</SubTitle>
-        <KakaoButton alt="kakao login" src="/images/register/kakao_login.png" />
+        <KakaoButton
+          alt="kakao login"
+          src="/images/register/kakao_login.png"
+          onClick={() => kakaoLogin()}
+        />
         <GoogleButton
           alt="kakao login"
           src="/images/register/kakao_login.png"
