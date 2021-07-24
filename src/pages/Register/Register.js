@@ -2,8 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import kakaoLogin from './kakaoLogin';
 import { flexSet } from '../../styles/mixin';
+import { useHistory } from 'react-router-dom';
 
 const Register = () => {
+  const history = useHistory();
+
   return (
     <RegisterWrap>
       <LoginWrap>
@@ -12,7 +15,7 @@ const Register = () => {
         <KakaoButton
           alt="kakao login"
           src="/images/register/kakao_login.png"
-          onClick={() => kakaoLogin()}
+          onClick={() => kakaoLogin(history)}
         />
         <GoogleButton
           alt="kakao login"

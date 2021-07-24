@@ -1,13 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import {
-  buttonSet,
-  flexSet,
-  textInputSet,
-  dateInputSet,
-} from '../../styles/mixin';
+import { buttonSet, flexSet } from '../../styles/mixin';
 
 const Information = () => {
+  const [today, setToday] = useState();
+  const [hangoutDate, setHangoutDate] = useState('');
+  const [femaleBirthDay, setFemaleBirthDay] = useState('');
+  const [maleBirthDay, setMaleBirthDay] = useState();
+  const [femaleNickName, setFemaleNickName] = useState('');
+  const [maleNickName, setMaleNickName] = useState('');
+  const [profileImage, setProfileImage] = useState();
+  const [inputNotification, setInputNotification] = useState(false);
+
+  useEffect(() => {
+    let now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    let date = now.getDate();
+
+    if (date < 10) {
+      date = '0' + date;
+    }
+
+    if (month < 10) {
+      month = '0' + month;
+    }
+
+    setToday(`${year}-${month}-${date}`);
+  }, []);
+
+  const handleInformation = (event, setData, validation) => {
+    const { value } = event.target;
+    validation ? value.length < 7 && setData(value) : setData(value);
+  };
+
+  const submitInformation = () => {
+    const conditions =
+      hangoutDate &&
+      femaleBirthDay &&
+      maleBirthDay &&
+      femaleNickName &&
+      maleNickName &&
+      profileImage;
+
+    conditions ? console.log('ok') : setInputNotification(true);
+  };
+
   return (
     <InformationWrap>
       <ContentsWrap>
@@ -17,11 +55,29 @@ const Information = () => {
           <InputWrap>
             <ListWrap>
               <Label>사귄날짜</Label>
-              <DateInput type="date"></DateInput>
+              <DateInput
+                type="date"
+                value={hangoutDate}
+                max={today}
+                onChange={e => handleInformation(e, setHangoutDate)}
+              />
             </ListWrap>
             <ListWrap>
               <Label>프로필</Label>
-              <ProfileButton>사진업로드</ProfileButton>
+              <ProfileInputWrap>
+                <ProfileInputLabel htmlFor="profile">
+                  파일선택
+                </ProfileInputLabel>
+                <ProfileInput
+                  id="profile"
+                  type="file"
+                  accept="image/*"
+                  onChange={e => setProfileImage(e.target.files[0])}
+                />
+                <ProfileName className={profileImage && 'profileNameOn'}>
+                  {profileImage && profileImage.name}
+                </ProfileName>
+              </ProfileInputWrap>
             </ListWrap>
           </InputWrap>
         </CategoryWrap>
@@ -31,13 +87,23 @@ const Information = () => {
             {' '}
             <ListWrap>
               <Label>생년월일</Label>
-              <DateInput type="date"></DateInput>
+              <DateInput
+                type="date"
+                max={today}
+                defaultValue={femaleBirthDay}
+                onChange={e => handleInformation(e, setFemaleBirthDay)}
+              />
             </ListWrap>
             <ListWrap>
               <Label>닉네임</Label>
               <NickNameWrap>
-                <NickNameInput type="text" placeholder="훌라춤감자맘" />
-                <TextCount>0/6</TextCount>
+                <NickNameInput
+                  type="text"
+                  placeholder="훌라춤감자맘"
+                  value={femaleNickName}
+                  onChange={e => handleInformation(e, setFemaleNickName, true)}
+                />
+                <TextCount>{femaleNickName.length}/6</TextCount>
               </NickNameWrap>
             </ListWrap>
           </InputWrap>
@@ -48,19 +114,31 @@ const Information = () => {
             {' '}
             <ListWrap>
               <Label>생년월일</Label>
-              <DateInput type="date"></DateInput>
+              <DateInput
+                type="date"
+                max={today}
+                value={maleBirthDay}
+                onChange={e => handleInformation(e, setMaleBirthDay)}
+              />
             </ListWrap>
             <ListWrap>
               <Label>닉네임</Label>
               <NickNameWrap>
-                <NickNameInput type="text" placeholder="콧수염아저씨" />
-                <TextCount>0/6</TextCount>
+                <NickNameInput
+                  type="text"
+                  placeholder="콧수염아저씨"
+                  value={maleNickName}
+                  onChange={e => handleInformation(e, setMaleNickName, true)}
+                />
+                <TextCount>{maleNickName.length}/6</TextCount>
               </NickNameWrap>
             </ListWrap>
           </InputWrap>
         </CategoryWrap>
-        <Notification>내용을 모두 입력해 주세요!</Notification>
-        <SubmitButton>등록</SubmitButton>
+        <Notification className={inputNotification && 'noticeOn'}>
+          내용을 모두 입력해 주세요!
+        </Notification>
+        <SubmitButton onClick={submitInformation}>등록</SubmitButton>
       </ContentsWrap>
     </InformationWrap>
   );
@@ -108,16 +186,60 @@ const ListWrap = styled.div`
 `;
 
 const Label = styled.div`
-  width: 80px;
+  width: 70px;
   color: ${props => props.theme.basicDarkGray};
 `;
 
 const DateInput = styled.input`
-  ${dateInputSet}
+  width: 170px;
+  height: 18px;
+  appearance: none;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicDarkGray};
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+  }
 `;
 
-const ProfileButton = styled.button`
-  ${buttonSet}
+const ProfileInputWrap = styled.div`
+  ${flexSet('column', 'flex-start', 'flex-start')}
+`;
+
+const ProfileInputLabel = styled.label`
+  width: 60px;
+  ${buttonSet('12px')}
+  padding: 5px;
+  text-align: center;
+`;
+
+const ProfileInput = styled.input`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 1px solid red;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+`;
+
+const ProfileName = styled.div`
+  display: none;
+
+  &.profileNameOn {
+    display: inline-block;
+    width: 170px;
+    margin-top: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    color: ${props => props.theme.basicDarkGray};
+    font-size: 12px;
+  }
 `;
 
 const NickNameWrap = styled.div`
@@ -125,7 +247,18 @@ const NickNameWrap = styled.div`
 `;
 
 const NickNameInput = styled.input`
-  ${textInputSet}
+  width: 145px;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicDarkGray};
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::placeholder {
+    color: ${props => props.theme.basicGray};
+  }
 `;
 
 const TextCount = styled.div`
@@ -135,10 +268,15 @@ const TextCount = styled.div`
 `;
 
 const Notification = styled.div`
-  margin-bottom: 10px;
-  color: red;
-  font-size: 12px;
-  text-align: center;
+  visibility: hidden;
+  height: 20px;
+
+  &.noticeOn {
+    visibility: visible;
+    color: red;
+    font-size: 12px;
+    text-align: center;
+  }
 `;
 
 const SubmitButton = styled.button`
