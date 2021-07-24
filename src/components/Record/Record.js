@@ -1,68 +1,133 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  buttonSet,
-  flexSet,
-  dateInputSet,
-  textInputSet,
-} from '../../styles/mixin';
+import { buttonSet, flexSet } from '../../styles/mixin';
 
-const Record = () => {
+const Record = props => {
+  const {
+    isOpen,
+    time,
+    setTime,
+    costCategory,
+    setCostCategory,
+    costContent,
+    setCostContent,
+    cost,
+    setCost,
+    picture,
+    setPicture,
+    story,
+    setStory,
+    notice,
+    handleData,
+    submitRecord,
+    close,
+  } = props;
+
   return (
-    <RecordWrap>
-      <ContentsWrap>
-        <MainTitle>
-          2021년 7월 31일 엘리펀트빌리지에서의 기록을 남기세요
-        </MainTitle>
-        <ListWrap>
-          <CategoryTitle>시간</CategoryTitle>
-          <TimeInput type="time"></TimeInput>
-        </ListWrap>
-        <ListWrap>
-          <CategoryTitle>비용</CategoryTitle>
-          <CostWrap>
-            <OptionSelect>
-              <option value="">항목선택</option>
-              <option value="food">식비</option>
-              <option value="transportation">교통비</option>
-              <option value="culture">문화비</option>
-              <option value="etc">기타</option>
-            </OptionSelect>
-            <CostTextInput type="text" placeholder="내용입력" />
-            <MoneyInputWrap>
-              <MoneyInput type="text" placeholder="금액입력" />
-              <div>원</div>
-            </MoneyInputWrap>
-          </CostWrap>
-        </ListWrap>
-        <ListWrap>
-          <CategoryTitle>사진</CategoryTitle>
-          <ProfileButton>사진업로드</ProfileButton>
-        </ListWrap>
-        <ListWrap>
-          <CategoryTitle>스토리</CategoryTitle>
-          <form>
-            <StoryInput rows="5" cols="30" placeholder="내용을 입력하세요" />
-          </form>
-        </ListWrap>
-        <div>
-          <EnrollButton>등록</EnrollButton>
-          <CancleButton>취소</CancleButton>
-        </div>
-      </ContentsWrap>
-    </RecordWrap>
+    <div>
+      {isOpen ? (
+        <RecordWrap>
+          <ContentsWrap>
+            <MainTitle>
+              2021년 7월 31일 엘리펀트빌리지에서의 기록을 남기세요
+            </MainTitle>
+            <ListWrap>
+              <CategoryTitle>
+                시간<Required>*</Required>
+              </CategoryTitle>
+              <TimeInput
+                type="time"
+                value={time}
+                onChange={e => handleData(e, setTime)}
+              ></TimeInput>
+            </ListWrap>
+            <ListWrap>
+              <CategoryTitle>
+                비용<Required>*</Required>
+              </CategoryTitle>
+              <CostWrap>
+                <OptionSelect
+                  value={costCategory}
+                  onChange={e => handleData(e, setCostCategory)}
+                >
+                  <option value="">항목선택</option>
+                  <option value="food">식비</option>
+                  <option value="transportation">교통비</option>
+                  <option value="culture">문화비</option>
+                  <option value="etc">기타</option>
+                </OptionSelect>
+                <CostTextInput
+                  type="text"
+                  placeholder="내용입력"
+                  value={costContent}
+                  onChange={e => handleData(e, setCostContent)}
+                />
+                <MoneyInputWrap>
+                  <MoneyInput
+                    type="text"
+                    placeholder="금액입력"
+                    value={cost}
+                    onChange={e => handleData(e, setCost, true)}
+                  />
+                  <WonText>원</WonText>
+                </MoneyInputWrap>
+              </CostWrap>
+            </ListWrap>
+            <ListWrap>
+              <CategoryTitle>사진</CategoryTitle>
+              <PictureWrap>
+                <PictureLabel htmlFor="picture">파일선택</PictureLabel>
+                <PictureInput
+                  id="picture"
+                  type="file"
+                  accept="image/*"
+                  onChange={e => setPicture(e.target.files[0])}
+                />
+                <PictureName className={picture && 'pictureNameOn'}>
+                  {picture && picture.name}
+                </PictureName>
+              </PictureWrap>
+            </ListWrap>
+            <ListWrap>
+              <CategoryTitle>스토리</CategoryTitle>
+              <form>
+                <StoryInput
+                  rows="5"
+                  cols="30"
+                  placeholder="내용을 입력하세요"
+                  value={story}
+                  onChange={e => handleData(e, setStory)}
+                />
+              </form>
+            </ListWrap>
+            <Notification className={notice && 'noticeOn'}>
+              필수 내용을 입력해 주세요!
+            </Notification>
+            <div>
+              <EnrollButton onClick={submitRecord}>등록</EnrollButton>
+              <CancleButton onClick={close}>취소</CancleButton>
+            </div>
+          </ContentsWrap>
+        </RecordWrap>
+      ) : null}
+    </div>
   );
 };
 
 const RecordWrap = styled.div`
   ${flexSet('row', 'center', 'center')}
-  height: 100vh;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
   background-color: rgba(120, 120, 120, 0.8);
 `;
 
 const ContentsWrap = styled.div`
   width: 500px;
-  height: 400px;
+  height: 420px;
   padding: 35px 20px;
   border: ${props => props.theme.basicBorder};
   background-color: white;
@@ -85,7 +150,19 @@ const CategoryTitle = styled.div`
 `;
 
 const TimeInput = styled.input`
-  ${dateInputSet}
+  height: 18px;
+  appearance: none;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicDarkGray};
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+  }
 `;
 
 const CostWrap = styled.div`
@@ -93,8 +170,19 @@ const CostWrap = styled.div`
 `;
 
 const OptionSelect = styled.select`
-  ${textInputSet}
+  height: 18px;
   margin-bottom: 5px;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicDarkGray};
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::placeholder {
+    color: ${props => props.theme.basicGray};
+  }
 `;
 
 const MoneyInputWrap = styled.div`
@@ -103,27 +191,103 @@ const MoneyInputWrap = styled.div`
 `;
 
 const CostTextInput = styled.input`
-  ${textInputSet}
+  height: 18px;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicDarkGray};
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::placeholder {
+    color: ${props => props.theme.basicGray};
+  }
 `;
 
 const MoneyInput = styled.input`
-  ${textInputSet}
-  margin-right: 5px;
+  height: 18px;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicDarkGray};
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::placeholder {
+    color: ${props => props.theme.basicGray};
+  }
 `;
 
-const ProfileButton = styled.button`
-  ${buttonSet}
+const PictureWrap = styled.div`
+  ${flexSet('row', 'flex-start', 'flex-start')}
+`;
+
+const PictureLabel = styled.label`
+  width: 60px;
+  ${buttonSet('12px')}
+  margin-right: 10px;
+  padding: 5px;
+  text-align: center;
+`;
+
+const PictureInput = styled.input`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 1px solid red;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+`;
+
+const PictureName = styled.div`
+  display: none;
+
+  &.pictureNameOn {
+    display: inline-block;
+    width: 330px;
+    margin-top: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    color: ${props => props.theme.basicDarkGray};
+    font-size: 12px;
+    text-align: left;
+  }
 `;
 
 const StoryInput = styled.textarea`
-  ${textInputSet}
   width: 410px;
   resize: none;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicDarkGray};
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::placeholder {
+    color: ${props => props.theme.basicGray};
+  }
+`;
+
+const Notification = styled.div`
+  visibility: hidden;
+
+  &.noticeOn {
+    visibility: visible;
+    height: 20px;
+    padding-bottom: 5px;
+    color: red;
+    font-size: 14px;
+  }
 `;
 
 const EnrollButton = styled.button`
   width: 120px;
-  margin-right: 10px;
+  margin-right: 5px;
   padding: 5px 0;
   border: 1px solid ${props => props.theme.keyColor};
   border-radius: 3px;
@@ -140,4 +304,12 @@ const CancleButton = styled.button`
   ${buttonSet('14px')}
 `;
 
+const Required = styled.span`
+  color: red;
+`;
+
+const WonText = styled.div`
+  font-size: 14px;
+  margin-left: 5px;
+`;
 export default Record;
