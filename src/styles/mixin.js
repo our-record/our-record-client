@@ -51,8 +51,7 @@ export const bottomTableDataSet = () => css`
   vertical-align: middle;
 `;
 
-export const textInputSet = (height = '18px') => css`
-  height: ${height};
+export const textInputSet = () => css`
   border: ${props => props.theme.basicBorder};
   color: ${props => props.theme.basicDarkGray};
 

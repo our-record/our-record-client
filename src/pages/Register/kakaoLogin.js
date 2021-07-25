@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const kakaoLogin = () => {
+const kakaoLogin = history => {
   window.Kakao.Auth.login({
     success: res => {
       const kakaoToken = res.access_token;
@@ -16,7 +16,7 @@ const kakaoLogin = () => {
             header: kakaoToken,
             data: { email: res.kakao_account.email },
           })
-            .then(res => console.log(res))
+            .then(res => history.push('/information'))
             .catch(error => console.log(error));
         },
         fail: error => {
