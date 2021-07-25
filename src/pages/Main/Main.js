@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
+import Record from '../../components/Record/Record';
 import {
   tableSet,
   tableHeadSet,
@@ -10,6 +12,60 @@ import {
 } from '../../styles/mixin';
 
 const Main = () => {
+  const [isRecordOpen, setIsRecordOpen] = useState(false);
+  const [time, setTime] = useState();
+  const [costCategory, setCostCategory] = useState();
+  const [costContent, setCostContent] = useState();
+  const [cost, setCost] = useState();
+  const [picture, setPicture] = useState();
+  const [story, setStory] = useState();
+  const [notice, setNotice] = useState(false);
+
+  const handleData = (event, setData, isCost) => {
+    const { value } = event.target;
+    isCost
+      ? setData(value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '1'))
+      : setData(value);
+  };
+
+  const submitRecord = () => {
+    const conditions = time && costCategory && costContent && cost;
+    conditions
+      ? window.confirm('기록을 등록하시겠습니까?') && enrollRecord()
+      : setNotice(true);
+  };
+
+  const enrollRecord = () => {
+    initializeRecord();
+
+    axios
+      .post('api', {
+        header: 'token',
+        date: 'data',
+      })
+      .then(res => {
+        console.log(res);
+      })
+      .catch(error => console.log(error));
+  };
+
+  const closeRecord = () => {
+    if (window.confirm('작성을 취소하시겠습니까?')) {
+      setIsRecordOpen(false);
+      initializeRecord();
+    }
+  };
+
+  const initializeRecord = () => {
+    setTime('');
+    setCostCategory('');
+    setCostContent('');
+    setCost('');
+    setPicture('');
+    setStory('');
+    setNotice('');
+  };
+
   return (
     <>
       <NavWrap>
@@ -35,7 +91,28 @@ const Main = () => {
           </NickNameWrap>
           <DDay>D + 100일</DDay>
           <RecordCalendar>달력</RecordCalendar>
-          <RecordButton>기록하기</RecordButton>
+          <RecordButton onClick={() => setIsRecordOpen(true)}>
+            기록하기
+          </RecordButton>
+          <Record
+            isOpen={isRecordOpen}
+            time={time}
+            setTime={setTime}
+            costCategory={costCategory}
+            setCostCategory={setCostCategory}
+            costContent={costContent}
+            setCostContent={setCostContent}
+            cost={cost}
+            setCost={setCost}
+            picture={picture}
+            setPicture={setPicture}
+            story={story}
+            setStory={setStory}
+            notice={notice}
+            handleData={handleData}
+            submitRecord={submitRecord}
+            close={closeRecord}
+          />
           <StatisticsButton>이 달의 통계</StatisticsButton>
         </SideWrap>
         <ContentsWrap>
@@ -185,7 +262,13 @@ const RecordButton = styled.button`
   width: 200px;
   margin: 5px 0;
   padding: 3px 0;
-  ${buttonSet}
+  border: 1px solid rgb(220, 220, 220);
+  border-radius: 3px;
+  color: ${props => props.theme.basicDarkGray};
+  background-color: white;
+  font-size: 12px;
+  box-shadow: 1px 1px rgb(200, 200, 200);
+  cursor: pointer;
 `;
 
 const StatisticsButton = styled.button`
