@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import styled from 'styled-components';
 import Record from '../../components/Record/Record';
+import Calendar from 'react-calendar';
+import styled from 'styled-components';
+import 'react-calendar/dist/Calendar.css';
 import {
   tableSet,
   tableHeadSet,
@@ -20,6 +22,7 @@ const Main = () => {
   const [picture, setPicture] = useState();
   const [story, setStory] = useState();
   const [notice, setNotice] = useState(false);
+  const [calendarDate, setCalendarDate] = useState(new Date());
 
   const handleData = (event, setData, isCost) => {
     const { value } = event.target;
@@ -90,7 +93,13 @@ const Main = () => {
             <span>콧수염아저씨</span>
           </NickNameWrap>
           <DDay>D + 100일</DDay>
-          <RecordCalendar>달력</RecordCalendar>
+          <RecordCalendar>
+            <Calendar
+              value={calendarDate}
+              maxDate={new Date()}
+              onChange={date => setCalendarDate(date)}
+            />
+          </RecordCalendar>
           <RecordButton onClick={() => setIsRecordOpen(true)}>
             기록하기
           </RecordButton>
@@ -180,14 +189,14 @@ const NavWrap = styled.div`
 `;
 
 const MainTitle = styled.div`
-  padding-left: 45px;
+  padding-left: 35px;
   font-family: 'Anton', sans-serif;
   font-size: 22px;
 `;
 
 const RightWrap = styled.div`
   ${flexSet('row', 'space-between', 'center')}
-  padding-right: 45px;
+  padding-right: 35px;
 `;
 
 const AlarmMessageWrap = styled.div`
@@ -208,7 +217,7 @@ const AlarmText = styled.div`
 `;
 
 const HomeButton = styled.img`
-  width: 22px;
+  width: 31px;
   padding-right: 10px;
   cursor: pointer;
 `;
@@ -220,14 +229,13 @@ const SettingButton = styled.img`
 
 const BodyWrap = styled.div`
   ${flexSet('row', 'space-between')}
-  padding: 0 45px;
+  padding: 0 35px;
 `;
 
 const SideWrap = styled.div`
   ${flexSet('column', 'flex-start', 'center')}
-  height: 95vh;
-  padding: 15vh 45px 30px 0;
-  border-right: ${props => props.theme.basicBorder};
+  height: 100%;
+  padding: 10vh 35px 30px 0;
 `;
 
 const ProfileImage = styled.img`
@@ -249,17 +257,17 @@ const HeartIcon = styled.img`
   margin: 0 5px;
 `;
 
-const DDay = styled.div``;
+const DDay = styled.div`
+  margin-top: 10px;
+`;
 
 const RecordCalendar = styled.div`
-  width: 200px;
-  height: 200px;
-  margin: 20px 0 10px 0;
-  border: ${props => props.theme.basicBorder};
+  width: 230px;
+  margin: 25px 0 10px 0;
 `;
 
 const RecordButton = styled.button`
-  width: 200px;
+  width: 230px;
   margin: 5px 0;
   padding: 3px 0;
   border: 1px solid rgb(220, 220, 220);
@@ -272,7 +280,7 @@ const RecordButton = styled.button`
 `;
 
 const StatisticsButton = styled.button`
-  width: 200px;
+  width: 230px;
   padding: 3px 0;
   ${buttonSet}
 `;
@@ -280,7 +288,8 @@ const StatisticsButton = styled.button`
 const ContentsWrap = styled.div`
   width: 100%;
   height: 100%;
-  padding: 15vh 0 30px 45px;
+  padding: 10vh 0 30px 45px;
+  border-left: ${props => props.theme.basicBorder};
 `;
 
 const MapWrap = styled.div`
