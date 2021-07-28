@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Record from '../../components/Record/Record';
+import SearchPlace from '../../components/Main/Map/SearchPlace';
 import Calendar from 'react-calendar';
 import styled from 'styled-components';
 import 'react-calendar/dist/Calendar.css';
@@ -23,6 +24,9 @@ const Main = () => {
   const [story, setStory] = useState();
   const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [placeName, setPlaceName] = useState();
+  const [long, setLong] = useState();
+  const [lat, setLat] = useState();
 
   const handleData = (event, setData, isCost) => {
     const { value } = event.target;
@@ -121,11 +125,18 @@ const Main = () => {
             handleData={handleData}
             submitRecord={submitRecord}
             close={closeRecord}
+            placeName={placeName}
           />
           <StatisticsButton>이 달의 통계</StatisticsButton>
         </SideWrap>
         <ContentsWrap>
-          <MapWrap>map</MapWrap>
+          <MapWrap>
+            <SearchPlace
+              setPlaceName={setPlaceName}
+              setLong={setLong}
+              setLat={setLat}
+            />
+          </MapWrap>
           <ListWrap>
             <ListTitle>그 날의 기록</ListTitle>
             <ListTable>
@@ -294,8 +305,7 @@ const ContentsWrap = styled.div`
 
 const MapWrap = styled.div`
   height: 65vh;
-  margin-bottom: 40px;
-  border: ${props => props.theme.basicBorder};
+  margin-bottom: 60px;
 `;
 
 const ListWrap = styled.div``;

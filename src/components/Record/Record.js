@@ -21,6 +21,7 @@ const Record = props => {
     handleData,
     submitRecord,
     close,
+    placeName,
   } = props;
 
   return (
@@ -29,7 +30,8 @@ const Record = props => {
         <RecordWrap>
           <ContentsWrap>
             <MainTitle>
-              2021년 7월 31일 엘리펀트빌리지에서의 기록을 남기세요
+              2021년 7월 31일{placeName ? ` ${placeName}에서` : ``}의 기록을
+              남기세요
             </MainTitle>
             <ListWrap>
               <CategoryTitle>
