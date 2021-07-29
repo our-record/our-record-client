@@ -22,6 +22,7 @@ const Main = () => {
   const [cost, setCost] = useState();
   const [picture, setPicture] = useState();
   const [story, setStory] = useState();
+  const [totalCost, setTotalCost] = useState();
   const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [convertedDate, setConvertedDate] = useState();
@@ -40,6 +41,8 @@ const Main = () => {
 
     axios.get('http://localhost:3000/data/record/record.json').then(res => {
       setRecordMarkers(res.data.result);
+      calculateTotalCost(res.data.result);
+      console.log(res.data.result);
       setIsLoading(false);
     });
   }, [calendarDate]);
@@ -88,6 +91,17 @@ const Main = () => {
     setStory('');
     setNotice('');
   };
+
+  const calculateTotalCost = data => {
+    let result = 0;
+    for (let i = 0; i < data.length; i++) {
+      result += data[i].cost;
+    }
+    console.log(typeof result);
+    setTotalCost(result);
+  };
+
+  console.log(totalCost);
 
   if (isLoading) {
     return (
@@ -186,23 +200,29 @@ const Main = () => {
                 <TableHead>사용금액</TableHead>
                 <TableHead>삭제/수정</TableHead>
               </tr>
-              <tr>
-                <TableData>
-                  <StoryImage alt="story" src="/icon/binoculars.png" />
-                </TableData>
-                <TableData>13:00</TableData>
-                <TableData>여장군 죽전</TableData>
-                <TableData>식비</TableData>
-                <TableData>고기 5인분, 소주</TableData>
-                <TableData>50,000원</TableData>
-                <TableData>
-                  <DeleteImage alt="delete" src="/icon/delete.png" />
-                  <EditImage alt="edit" src="/icon/edit.png" />
-                </TableData>
-              </tr>
+              {recordMarkers.map(data => {
+                return (
+                  <tr key={data.time}>
+                    <TableData>
+                      <StoryImage alt="story" src="/icon/binoculars.png" />
+                    </TableData>
+                    <TableData>{data.time}</TableData>
+                    <TableData>{data.place}</TableData>
+                    <TableData>{data.category}</TableData>
+                    <TableData>{data.content}</TableData>
+                    <TableData>{data.cost.toLocaleString()}원</TableData>
+                    <TableData>
+                      <DeleteImage alt="delete" src="/icon/delete.png" />
+                      <EditImage alt="edit" src="/icon/edit.png" />
+                    </TableData>
+                  </tr>
+                );
+              })}
               <tr>
                 <BottomTableData colSpan="5">합계</BottomTableData>
-                <BottomTableData>50,000원</BottomTableData>
+                <BottomTableData>
+                  {Number(totalCost).toLocaleString()}원
+                </BottomTableData>
                 <BottomTableData className="allDeleteButton">
                   전체삭제
                 </BottomTableData>

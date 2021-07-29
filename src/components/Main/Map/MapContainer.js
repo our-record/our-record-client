@@ -9,25 +9,20 @@ const MapContainer = ({
   setPlaceName,
   recordMarkers,
 }) => {
-  const [initialCenterX, setInitialCenterX] = useState();
-  const [initialCenterY, setInitialCenterY] = useState();
   const { kakao } = window;
 
   useEffect(() => {
     const container = document.getElementById('myMap');
-    console.log(initialCenterY, initialCenterX);
 
     const options = {
-      center: recordMarkers
-        ? new kakao.maps.LatLng(recordMarkers[0].y, recordMarkers[0].x)
-        : new kakao.maps.LatLng(37.28057234546219, 127.01017663391963),
+      center: new kakao.maps.LatLng(37.28057234546219, 127.01017663391963),
       level: 3,
     };
 
     const map = new kakao.maps.Map(container, options);
 
     const setRecordMarkers = recordMarkers => {
-      let linePath = [];
+      let points = [];
 
       for (var i = 0; i < recordMarkers.length; i++) {
         const MarkerOverlay = new kakao.maps.CustomOverlay({
@@ -47,14 +42,22 @@ const MapContainer = ({
           zIndex: 0,
         });
 
-        linePath[i] = new kakao.maps.LatLng(
+        points[i] = new kakao.maps.LatLng(
           recordMarkers[i].y,
-          recordMarkers[i].long
+          recordMarkers[i].x
         );
       }
 
+      const bounds = new kakao.maps.LatLngBounds();
+
+      for (i = 0; i < points.length; i++) {
+        bounds.extend(points[i]);
+      }
+
+      map.setBounds(bounds);
+
       const polyLine = new kakao.maps.Polyline({
-        path: linePath,
+        path: points,
         strokeWeight: 2,
         strokeColor: '#ff1b4b',
         strokeOpacity: 0.7,
@@ -107,8 +110,6 @@ const MapContainer = ({
       </div>
       `;
 
-      console.log(place);
-
       let overlay = new kakao.maps.CustomOverlay({
         content: content,
         map: map,
@@ -139,29 +140,6 @@ const MapContainer = ({
       displayMarker(dataNumber, markerImage);
     };
   }, [searchPlace, recordMarkers]);
-
-  // const getInitialCenter = dataArray => {
-  //   let resultX = [];
-  //   let resultY = [];
-  //   for (let i = 0; i < dataArray.length; i++) {
-  //     for (let j = i + 1; j < dataArray.length; j++) {
-  //       dataArray[i].coordinate - dataArray[j].y > 0
-  //         ? resultY.push(dataArray[i].y - dataArray[j].y)
-  //         : resultY.push((dataArray[i].y - dataArray[j].y) * -1);
-  //     }
-  //   }
-
-  //   for (let i = 0; i < dataArray.length; i++) {
-  //     for (let j = i + 1; j < dataArray.length; j++) {
-  //       dataArray[i].coordinate + dataArray[j].y > 0
-  //         ? resultX.push(dataArray[i].x - dataArray[j].x)
-  //         : resultX.push((dataArray[i].x - dataArray[j].x) * -1);
-  //     }
-  //   }
-
-  //   setInitialCenterX(Math.max(...resultX) / 2);
-  //   setInitialCenterY(Math.max(...resultY) / 2);
-  // };
 
   return (
     <div
