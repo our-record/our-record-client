@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Record from '../../components/Record/Record';
 import SearchPlace from '../../components/Main/Map/SearchPlace';
@@ -24,9 +24,25 @@ const Main = () => {
   const [story, setStory] = useState();
   const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [convertedDate, setConvertedDate] = useState();
   const [placeName, setPlaceName] = useState();
   const [long, setLong] = useState();
   const [lat, setLat] = useState();
+  const [recordMarkers, setRecordMarkers] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const year = calendarDate.getFullYear();
+    const month = `0${calendarDate.getMonth() + 1}`.slice(-2);
+    const date = `0${calendarDate.getDate()}`.slice(-2);
+
+    setConvertedDate(`${year}-${month}-${date}`);
+
+    axios.get('http://localhost:3000/data/record/record.json').then(res => {
+      setRecordMarkers(res.data.result);
+      setIsLoading(false);
+    });
+  }, [calendarDate]);
 
   const handleData = (event, setData, isCost) => {
     const { value } = event.target;
@@ -73,6 +89,14 @@ const Main = () => {
     setNotice('');
   };
 
+  if (isLoading) {
+    return (
+      <div>
+        <h1>데이터를 불러오는 중입니다...</h1>
+      </div>
+    );
+  }
+
   return (
     <>
       <NavWrap>
@@ -80,7 +104,7 @@ const Main = () => {
         <RightWrap>
           <AlarmMessageWrap>
             <AlarmImage alt="alarm" src="/icon/notification-red.png" />
-            <AlarmText>[11월 11일] 우리의 200일 😍 </AlarmText>
+            <AlarmText>가까운 기념일이 없습니다</AlarmText>
           </AlarmMessageWrap>
           <div>
             <HomeButton alt="home button" src="/icon/home-black.png" />
@@ -126,6 +150,7 @@ const Main = () => {
             submitRecord={submitRecord}
             close={closeRecord}
             placeName={placeName}
+            convertedDate={convertedDate}
           />
           <StatisticsButton>이 달의 통계</StatisticsButton>
         </SideWrap>
@@ -135,6 +160,9 @@ const Main = () => {
               setPlaceName={setPlaceName}
               setLong={setLong}
               setLat={setLat}
+              calendarDate={calendarDate}
+              convertedDate={convertedDate}
+              recordMarkers={recordMarkers}
             />
           </MapWrap>
           <ListWrap>
