@@ -1,17 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import { flexSet } from '../../styles/mixin';
-import { useHistory } from 'react-router-dom';
 
 const Register = () => {
-  const history = useHistory();
-
   return (
     <RegisterWrap>
       <LoginWrap>
         <MainTitle>Our Record</MainTitle>
         <SubTitle>둘 만의 소중한 순간을 기록하세요</SubTitle>
-        <a href="http://10.58.6.150:4000/kakao">
+        <a href="http://10.58.3.226:4000/kakao">
           <KakaoButton
             alt="kakao login"
             src="/images/register/kakao_login.png"

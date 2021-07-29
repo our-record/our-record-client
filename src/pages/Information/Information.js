@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
+import LinkCopy from '../../components/Information/LinkCopy';
 import styled from 'styled-components';
 import { buttonSet, flexSet } from '../../styles/mixin';
+import axios from 'axios';
 
 const Information = () => {
   const [today, setToday] = useState();
   const [hangoutDate, setHangoutDate] = useState('');
-  const [femaleBirthDay, setFemaleBirthDay] = useState('');
-  const [maleBirthDay, setMaleBirthDay] = useState();
-  const [femaleNickName, setFemaleNickName] = useState('');
-  const [maleNickName, setMaleNickName] = useState('');
+  const [birthDay, setBirthDay] = useState('');
+  const [invitedBirthday, setInvitedBirthday] = useState('');
+  const [nickName, setNickName] = useState('');
+  const [invitedNickName, setInvitedNickName] = useState('');
   const [profileImage, setProfileImage] = useState();
   const [inputNotification, setInputNotification] = useState(false);
+  const location = useLocation();
+  const history = useHistory();
 
   useEffect(() => {
     let now = new Date();
@@ -34,111 +39,147 @@ const Information = () => {
     validation ? value.length < 7 && setData(value) : setData(value);
   };
 
-  const submitInformation = () => {
-    const conditions =
-      hangoutDate &&
-      femaleBirthDay &&
-      maleBirthDay &&
-      femaleNickName &&
-      maleNickName &&
-      profileImage;
+  const checkInformation = e => {
+    e.preventDefault();
 
-    conditions ? console.log('ok') : setInputNotification(true);
+    const conditions = hangoutDate && birthDay && birthDay && profileImage;
+    conditions ? submitInformation() : setInputNotification(true);
+  };
+
+  const submitInformation = () => {
+    const userData = new FormData();
+
+    if (location.search.length !== 0) {
+      userData.append('dday', hangoutDate);
+      userData.append('first_user_birth', birthDay);
+      userData.append('couple_img', profileImage);
+      userData.append('nickname', nickName);
+    } else {
+      userData.append('invite_user_birth', invitedBirthday);
+      userData.append('nickname', invitedNickName);
+    }
+
+    for (let key of userData.values()) {
+      console.log(key);
+    }
+
+    location.search.length !== 0
+      ? axios({
+          url: 'http://10.58.3.226:4000/user/register-info',
+          method: 'post',
+          data: userData,
+        }).then(res => {
+          alert('정보 입력이 완료되었습니다');
+          history.push('/');
+        })
+      : axios({
+          url: 'http://10.58.3.226:4000/user/register-info',
+          method: 'post',
+          data: userData,
+        }).then(res => {
+          alert('정보 입력이 완료되었습니다');
+          history.push('/');
+        });
   };
 
   return (
     <InformationWrap>
       <ContentsWrap>
         <MainTitle>정보를 입력해 주세요</MainTitle>
-        <CategoryWrap>
-          <CategoryTitle>커플</CategoryTitle>
-          <InputWrap>
-            <ListWrap>
-              <Label>사귄날짜</Label>
-              <DateInput
-                type="date"
-                value={hangoutDate}
-                max={today}
-                onChange={e => handleInformation(e, setHangoutDate)}
-              />
-            </ListWrap>
-            <ListWrap>
-              <Label>프로필</Label>
-              <ProfileInputWrap>
-                <ProfileInputLabel htmlFor="profile">
-                  파일선택
-                </ProfileInputLabel>
-                <ProfileInput
-                  id="profile"
-                  type="file"
-                  accept="image/*"
-                  onChange={e => setProfileImage(e.target.files[0])}
+        <form onSubmit={checkInformation} enctype="multipart/form-data">
+          {location.search.length !== 0 && (
+            <CategoryWrap>
+              <CategoryTitle>커플</CategoryTitle>
+              <InputWrap>
+                <ListWrap>
+                  <div>
+                    <Label>초대링크</Label>
+                    <LinkCopy
+                      text={`http://10.58.3.226:4000/kakao/${location.search.slice(
+                        6
+                      )}`}
+                    />
+                  </div>
+                  <LinkWrap>
+                    <InviteLink>
+                      {`http://10.58.3.226:4000/kakao/${location.search.slice(
+                        6
+                      )}`}
+                    </InviteLink>
+                    <LinkNotice>
+                      (!) 상대방에게 초대링크를 보내주세요
+                    </LinkNotice>
+                  </LinkWrap>
+                </ListWrap>
+                <ListWrap>
+                  <Label>사귄날짜</Label>
+                  <DateInput
+                    type="date"
+                    value={hangoutDate}
+                    max={today}
+                    onChange={e => handleInformation(e, setHangoutDate)}
+                  />
+                </ListWrap>
+                <ListWrap>
+                  <Label>프로필</Label>
+                  <ProfileInputWrap>
+                    <ProfileInputLabel htmlFor="profile">
+                      파일선택
+                    </ProfileInputLabel>
+                    <ProfileInput
+                      id="profile"
+                      type="file"
+                      accept="image/*"
+                      onChange={e => setProfileImage(e.target.files[0])}
+                    />
+                    <ProfileName className={profileImage && 'profileNameOn'}>
+                      {profileImage && profileImage.name}
+                    </ProfileName>
+                  </ProfileInputWrap>
+                </ListWrap>
+              </InputWrap>
+            </CategoryWrap>
+          )}
+          <CategoryWrap>
+            <CategoryTitle>개인</CategoryTitle>
+            <InputWrap>
+              {' '}
+              <ListWrap>
+                <Label>생년월일</Label>
+                <DateInput
+                  type="date"
+                  max={today}
+                  defaultValue={birthDay}
+                  onChange={e =>
+                    location.search.length !== 0
+                      ? handleInformation(e, setBirthDay)
+                      : handleInformation(e, setInvitedBirthday)
+                  }
                 />
-                <ProfileName className={profileImage && 'profileNameOn'}>
-                  {profileImage && profileImage.name}
-                </ProfileName>
-              </ProfileInputWrap>
-            </ListWrap>
-          </InputWrap>
-        </CategoryWrap>
-        <CategoryWrap>
-          <CategoryTitle>여성</CategoryTitle>
-          <InputWrap>
-            {' '}
-            <ListWrap>
-              <Label>생년월일</Label>
-              <DateInput
-                type="date"
-                max={today}
-                defaultValue={femaleBirthDay}
-                onChange={e => handleInformation(e, setFemaleBirthDay)}
-              />
-            </ListWrap>
-            <ListWrap>
-              <Label>닉네임</Label>
-              <NickNameWrap>
-                <NickNameInput
-                  type="text"
-                  placeholder="훌라춤감자맘"
-                  value={femaleNickName}
-                  onChange={e => handleInformation(e, setFemaleNickName, true)}
-                />
-                <TextCount>{femaleNickName.length}/6</TextCount>
-              </NickNameWrap>
-            </ListWrap>
-          </InputWrap>
-        </CategoryWrap>
-        <CategoryWrap>
-          <CategoryTitle>남성</CategoryTitle>
-          <InputWrap>
-            {' '}
-            <ListWrap>
-              <Label>생년월일</Label>
-              <DateInput
-                type="date"
-                max={today}
-                value={maleBirthDay}
-                onChange={e => handleInformation(e, setMaleBirthDay)}
-              />
-            </ListWrap>
-            <ListWrap>
-              <Label>닉네임</Label>
-              <NickNameWrap>
-                <NickNameInput
-                  type="text"
-                  placeholder="콧수염아저씨"
-                  value={maleNickName}
-                  onChange={e => handleInformation(e, setMaleNickName, true)}
-                />
-                <TextCount>{maleNickName.length}/6</TextCount>
-              </NickNameWrap>
-            </ListWrap>
-          </InputWrap>
-        </CategoryWrap>
-        <Notification className={inputNotification && 'noticeOn'}>
-          내용을 모두 입력해 주세요!
-        </Notification>
-        <SubmitButton onClick={submitInformation}>등록</SubmitButton>
+              </ListWrap>
+              <ListWrap>
+                <Label>닉네임</Label>
+                <NickNameWrap>
+                  <NickNameInput
+                    type="text"
+                    placeholder="훌라춤감자맘"
+                    value={nickName}
+                    onChange={e =>
+                      location.search.length !== 0
+                        ? handleInformation(e, setNickName, true)
+                        : handleInformation(e, setInvitedNickName, true)
+                    }
+                  />
+                  <TextCount>{nickName.length}/8</TextCount>
+                </NickNameWrap>
+              </ListWrap>
+            </InputWrap>
+          </CategoryWrap>
+          <Notification className={inputNotification && 'noticeOn'}>
+            내용을 모두 입력해 주세요!
+          </Notification>
+          <SubmitButton type="submit">등록</SubmitButton>
+        </form>
       </ContentsWrap>
     </InformationWrap>
   );
@@ -182,7 +223,7 @@ const InputWrap = styled.div`
 
 const ListWrap = styled.div`
   ${flexSet('row', 'flex-start', 'center')}
-  margin: 10px 0;
+  margin: 15px 0;
 `;
 
 const Label = styled.div`
@@ -289,6 +330,22 @@ const SubmitButton = styled.button`
   box-shadow: 2px 2px #ffc7b5;
   font-size: 16px;
   cursor: pointer;
+`;
+
+const LinkWrap = styled.div`
+  width: 173px;
+`;
+
+const InviteLink = styled.div`
+  width: 100%;
+  word-break: break-all;
+  font-size: 12px;
+`;
+
+const LinkNotice = styled.div`
+  margin-top: 3px;
+  color: red;
+  font-size: 10px;
 `;
 
 export default Information;
