@@ -22,7 +22,18 @@ const Record = props => {
     submitRecord,
     close,
     placeName,
+    convertedDate,
   } = props;
+
+  const showDate = () => {
+    const year = convertedDate.substring(0, 4);
+    const month = convertedDate.substring(5, 7);
+    const date = convertedDate.substring(8, 10);
+
+    return `${year}년 ${month[0] === '0' ? month.substr(1, 1) : month}월 ${
+      date[0] === '0' ? date.substr(1, 1) : date
+    }일`;
+  };
 
   return (
     <div>
@@ -30,8 +41,8 @@ const Record = props => {
         <RecordWrap>
           <ContentsWrap>
             <MainTitle>
-              2021년 7월 31일{placeName ? ` ${placeName}에서` : ``}의 기록을
-              남기세요
+              {showDate()}
+              {placeName ? ` ${placeName}에서` : ``}의 기록을 남기세요
             </MainTitle>
             <ListWrap>
               <CategoryTitle>

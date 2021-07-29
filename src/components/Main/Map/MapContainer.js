@@ -1,18 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import './overlay.css';
+import './markerOverlay.css';
 
-const { kakao } = window;
-
-const MapContainer = ({ searchPlace, setPlaceName, setLong, setLat }) => {
-  const [isSelected, setIsSelected] = useState();
+const MapContainer = ({
+  searchPlace,
+  setLong,
+  setLat,
+  setPlaceName,
+  recordMarkers,
+}) => {
+  const [initialCenterX, setInitialCenterX] = useState();
+  const [initialCenterY, setInitialCenterY] = useState();
+  const { kakao } = window;
 
   useEffect(() => {
     const container = document.getElementById('myMap');
+    console.log(initialCenterY, initialCenterX);
+
     const options = {
-      center: new kakao.maps.LatLng(37.28057234546219, 127.01017663391963),
+      center: recordMarkers
+        ? new kakao.maps.LatLng(recordMarkers[0].y, recordMarkers[0].x)
+        : new kakao.maps.LatLng(37.28057234546219, 127.01017663391963),
       level: 3,
     };
+
     const map = new kakao.maps.Map(container, options);
+
+    const setRecordMarkers = recordMarkers => {
+      let linePath = [];
+
+      for (var i = 0; i < recordMarkers.length; i++) {
+        const MarkerOverlay = new kakao.maps.CustomOverlay({
+          map: map,
+          clickable: true,
+          content: `
+          <div class="customOverlay">
+            <img src="/icon/pin.png"></img>
+            <div>${i + 1}</div>
+          </div>`,
+          position: new kakao.maps.LatLng(
+            recordMarkers[i].y,
+            recordMarkers[i].x
+          ),
+          xAnchor: 0.5,
+          yAnchor: 1,
+          zIndex: 0,
+        });
+
+        linePath[i] = new kakao.maps.LatLng(
+          recordMarkers[i].y,
+          recordMarkers[i].long
+        );
+      }
+
+      const polyLine = new kakao.maps.Polyline({
+        path: linePath,
+        strokeWeight: 2,
+        strokeColor: '#ff1b4b',
+        strokeOpacity: 0.7,
+        strokeStyle: 'solid',
+      });
+
+      polyLine.setMap(map);
+    };
+
+    recordMarkers && setRecordMarkers(recordMarkers);
 
     const ps = new kakao.maps.services.Places();
 
@@ -55,6 +107,8 @@ const MapContainer = ({ searchPlace, setPlaceName, setLong, setLat }) => {
       </div>
       `;
 
+      console.log(place);
+
       let overlay = new kakao.maps.CustomOverlay({
         content: content,
         map: map,
@@ -83,9 +137,31 @@ const MapContainer = ({ searchPlace, setPlaceName, setLong, setLat }) => {
       );
 
       displayMarker(dataNumber, markerImage);
-      setIsSelected(dataNumber.index);
     };
-  }, [searchPlace, isSelected]);
+  }, [searchPlace, recordMarkers]);
+
+  // const getInitialCenter = dataArray => {
+  //   let resultX = [];
+  //   let resultY = [];
+  //   for (let i = 0; i < dataArray.length; i++) {
+  //     for (let j = i + 1; j < dataArray.length; j++) {
+  //       dataArray[i].coordinate - dataArray[j].y > 0
+  //         ? resultY.push(dataArray[i].y - dataArray[j].y)
+  //         : resultY.push((dataArray[i].y - dataArray[j].y) * -1);
+  //     }
+  //   }
+
+  //   for (let i = 0; i < dataArray.length; i++) {
+  //     for (let j = i + 1; j < dataArray.length; j++) {
+  //       dataArray[i].coordinate + dataArray[j].y > 0
+  //         ? resultX.push(dataArray[i].x - dataArray[j].x)
+  //         : resultX.push((dataArray[i].x - dataArray[j].x) * -1);
+  //     }
+  //   }
+
+  //   setInitialCenterX(Math.max(...resultX) / 2);
+  //   setInitialCenterY(Math.max(...resultY) / 2);
+  // };
 
   return (
     <div
