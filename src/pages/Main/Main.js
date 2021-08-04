@@ -22,7 +22,7 @@ const Main = () => {
   const [cost, setCost] = useState();
   const [picture, setPicture] = useState();
   const [story, setStory] = useState();
-  const [totalCost, setTotalCost] = useState();
+  const [totalCost, setTotalCost] = useState(0);
   const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [convertedDate, setConvertedDate] = useState();
@@ -54,7 +54,9 @@ const Main = () => {
       : setData(value);
   };
 
-  const submitRecord = () => {
+  const submitRecord = e => {
+    e.preventDefault();
+
     const conditions = time && costCategory && costContent && cost;
     conditions
       ? window.confirm('기록을 등록하시겠습니까?') && enrollRecord()
@@ -62,24 +64,34 @@ const Main = () => {
   };
 
   const enrollRecord = () => {
-    initializeRecord();
+    const recordData = new FormData();
 
-    axios
-      .post('api', {
-        header: 'token',
-        date: 'data',
-      })
-      .then(res => {
-        console.log(res);
-      })
-      .catch(error => console.log(error));
+    recordData.append('time', time);
+    recordData.append('costCategory', costCategory);
+    recordData.append('costContent', costContent);
+    recordData.append('cost', cost);
+    recordData.append('picture', picture);
+    recordData.append('story', story);
+
+    axios({
+      url: 'http://10.58.3.226:4000/user/register-info',
+      method: 'post',
+      data: recordData,
+    }).then(res => {
+      alert('정보 입력이 완료되었습니다');
+      closeRecord();
+    });
+  };
+
+  const cancleRecord = () => {
+    if (window.confirm('작성을 취소하시겠습니까?')) {
+      closeRecord();
+    }
   };
 
   const closeRecord = () => {
-    if (window.confirm('작성을 취소하시겠습니까?')) {
-      setIsRecordOpen(false);
-      initializeRecord();
-    }
+    setIsRecordOpen(false);
+    initializeRecord();
   };
 
   const initializeRecord = () => {
@@ -93,15 +105,14 @@ const Main = () => {
   };
 
   const calculateTotalCost = data => {
-    let result = 0;
+    let totalcost = 0;
     for (let i = 0; i < data.length; i++) {
-      result += data[i].cost;
+      totalcost += data[i].cost;
     }
-    console.log(typeof result);
-    setTotalCost(result);
+    console.log(typeof totalcost);
+    setTotalCost(totalCost);
+    console.log(typeof totalCost);
   };
-
-  console.log(totalCost);
 
   if (isLoading) {
     return (
@@ -162,7 +173,7 @@ const Main = () => {
             notice={notice}
             handleData={handleData}
             submitRecord={submitRecord}
-            close={closeRecord}
+            close={cancleRecord}
             placeName={placeName}
             convertedDate={convertedDate}
           />
@@ -220,9 +231,7 @@ const Main = () => {
               })}
               <tr>
                 <BottomTableData colSpan="5">합계</BottomTableData>
-                <BottomTableData>
-                  {Number(totalCost).toLocaleString()}원
-                </BottomTableData>
+                <BottomTableData>{totalCost}원</BottomTableData>
                 <BottomTableData className="allDeleteButton">
                   전체삭제
                 </BottomTableData>

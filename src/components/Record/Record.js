@@ -40,70 +40,70 @@ const Record = props => {
       {isOpen ? (
         <RecordWrap>
           <ContentsWrap>
-            <MainTitle>
-              {showDate()}
-              {placeName ? ` ${placeName}에서` : ``}의 기록을 남기세요
-            </MainTitle>
-            <ListWrap>
-              <CategoryTitle>
-                시간<Required>*</Required>
-              </CategoryTitle>
-              <TimeInput
-                type="time"
-                value={time}
-                onChange={e => handleData(e, setTime)}
-              ></TimeInput>
-            </ListWrap>
-            <ListWrap>
-              <CategoryTitle>
-                비용<Required>*</Required>
-              </CategoryTitle>
-              <CostWrap>
-                <OptionSelect
-                  value={costCategory}
-                  onChange={e => handleData(e, setCostCategory)}
-                >
-                  <option value="">항목선택</option>
-                  <option value="food">식비</option>
-                  <option value="transportation">교통비</option>
-                  <option value="culture">문화비</option>
-                  <option value="etc">기타</option>
-                </OptionSelect>
-                <CostTextInput
-                  type="text"
-                  placeholder="내용입력"
-                  value={costContent}
-                  onChange={e => handleData(e, setCostContent)}
-                />
-                <MoneyInputWrap>
-                  <MoneyInput
+            <form onSubmit={submitRecord} enctype="multipart/form-data">
+              <MainTitle>
+                {showDate()}
+                {placeName ? ` ${placeName}에서` : ``}의 기록을 남기세요
+              </MainTitle>
+              <ListWrap>
+                <CategoryTitle>
+                  시간<Required>*</Required>
+                </CategoryTitle>
+                <TimeInput
+                  type="time"
+                  value={time}
+                  onChange={e => handleData(e, setTime)}
+                ></TimeInput>
+              </ListWrap>
+              <ListWrap>
+                <CategoryTitle>
+                  비용<Required>*</Required>
+                </CategoryTitle>
+                <CostWrap>
+                  <OptionSelect
+                    value={costCategory}
+                    onChange={e => handleData(e, setCostCategory)}
+                  >
+                    <option value="">항목선택</option>
+                    <option value="food">식비</option>
+                    <option value="transportation">교통비</option>
+                    <option value="culture">문화비</option>
+                    <option value="etc">기타</option>
+                  </OptionSelect>
+                  <CostTextInput
                     type="text"
-                    placeholder="금액입력"
-                    value={cost}
-                    onChange={e => handleData(e, setCost, true)}
+                    placeholder="내용입력"
+                    value={costContent}
+                    onChange={e => handleData(e, setCostContent)}
                   />
-                  <WonText>원</WonText>
-                </MoneyInputWrap>
-              </CostWrap>
-            </ListWrap>
-            <ListWrap>
-              <CategoryTitle>사진</CategoryTitle>
-              <PictureWrap>
-                <PictureLabel htmlFor="picture">파일선택</PictureLabel>
-                <PictureInput
-                  id="picture"
-                  type="file"
-                  accept="image/*"
-                  onChange={e => setPicture(e.target.files[0])}
-                />
-                <PictureName className={picture && 'pictureNameOn'}>
-                  {picture && picture.name}
-                </PictureName>
-              </PictureWrap>
-            </ListWrap>
-            <ListWrap>
-              <CategoryTitle>스토리</CategoryTitle>
-              <form>
+                  <MoneyInputWrap>
+                    <MoneyInput
+                      type="text"
+                      placeholder="금액입력"
+                      value={cost}
+                      onChange={e => handleData(e, setCost, true)}
+                    />
+                    <WonText>원</WonText>
+                  </MoneyInputWrap>
+                </CostWrap>
+              </ListWrap>
+              <ListWrap>
+                <CategoryTitle>사진</CategoryTitle>
+                <PictureWrap>
+                  <PictureLabel htmlFor="picture">파일선택</PictureLabel>
+                  <PictureInput
+                    id="picture"
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setPicture(e.target.files[0])}
+                  />
+                  <PictureName className={picture && 'pictureNameOn'}>
+                    {picture && picture.name}
+                  </PictureName>
+                </PictureWrap>
+              </ListWrap>
+              <ListWrap>
+                <CategoryTitle>스토리</CategoryTitle>
                 <StoryInput
                   rows="5"
                   cols="30"
@@ -111,15 +111,15 @@ const Record = props => {
                   value={story}
                   onChange={e => handleData(e, setStory)}
                 />
-              </form>
-            </ListWrap>
-            <Notification className={notice && 'noticeOn'}>
-              필수 내용을 입력해 주세요!
-            </Notification>
-            <div>
-              <EnrollButton onClick={submitRecord}>등록</EnrollButton>
-              <CancleButton onClick={close}>취소</CancleButton>
-            </div>
+              </ListWrap>
+              <Notification className={notice && 'noticeOn'}>
+                필수 내용을 입력해 주세요!
+              </Notification>
+              <div>
+                <EnrollButton type="submit">등록</EnrollButton>
+                <CancleButton onClick={close}>취소</CancleButton>
+              </div>
+            </form>
           </ContentsWrap>
         </RecordWrap>
       ) : null}
