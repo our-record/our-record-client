@@ -51,12 +51,12 @@ const Information = () => {
 
     if (location.search.length !== 0) {
       userData.append('dday', hangoutDate);
-      userData.append('first_user_birth', birthDay);
+      userData.append('invitor_birth', birthDay);
       userData.append('couple_img', profileImage);
-      userData.append('nickname', nickName);
+      userData.append('invitor_nickname', nickName);
     } else {
-      userData.append('invite_user_birth', invitedBirthday);
-      userData.append('nickname', invitedNickName);
+      userData.append('invitee_birth', invitedBirthday);
+      userData.append('invitee_nickname', invitedNickName);
     }
 
     for (let key of userData.values()) {

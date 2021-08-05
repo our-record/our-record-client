@@ -65,10 +65,10 @@ const Record = props => {
                     onChange={e => handleData(e, setCostCategory)}
                   >
                     <option value="">항목선택</option>
-                    <option value="food">식비</option>
-                    <option value="transportation">교통비</option>
-                    <option value="culture">문화비</option>
-                    <option value="etc">기타</option>
+                    <option value="1">식비</option>
+                    <option value="2">문화비</option>
+                    <option value="3">교통비</option>
+                    <option value="4">기타</option>
                   </OptionSelect>
                   <CostTextInput
                     type="text"
