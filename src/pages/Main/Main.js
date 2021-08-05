@@ -4,7 +4,6 @@ import Record from '../../components/Record/Record';
 import Story from '../../components/Story/Story';
 import SearchPlace from '../../components/Main/Map/SearchPlace';
 import Calendar from 'react-calendar';
-import { API } from '../../config';
 import styled from 'styled-components';
 import 'react-calendar/dist/Calendar.css';
 import {
@@ -15,6 +14,7 @@ import {
   buttonSet,
   flexSet,
 } from '../../styles/mixin';
+import { API } from '../../config';
 
 const Main = () => {
   const [isRecordOpen, setIsRecordOpen] = useState(false);
@@ -295,7 +295,13 @@ const Main = () => {
               </ListTable>
             </ListWrap>
           ) : (
-            <EmptyData>데이터가 없어요ㅠㅠ</EmptyData>
+            <EmptyData>
+              <EmptyDataImage alt="sad face" src="/icon/sad.png" />
+              <br />
+              기록이 없어요
+              <br />
+              새로운 추억을 남겨 보세요!
+            </EmptyData>
           )}
         </ContentsWrap>
       </BodyWrap>
@@ -332,7 +338,7 @@ const AlarmMessageWrap = styled.div`
 `;
 
 const AlarmImage = styled.img`
-  width: 22px;
+  width: 20px;
   margin-right: 10px;
 `;
 
@@ -344,13 +350,13 @@ const AlarmText = styled.div`
 `;
 
 const HomeButton = styled.img`
-  width: 31px;
+  width: 29px;
   padding-right: 10px;
   cursor: pointer;
 `;
 
 const SettingButton = styled.img`
-  width: 22px;
+  width: 20px;
   cursor: pointer;
 `;
 
@@ -470,8 +476,17 @@ const EditImage = styled.img`
 `;
 
 const EmptyData = styled.div`
+  min-height: 160px;
+  padding-top: 20px;
+  color: ${props => props.theme.basicGray};
   text-align: center;
-  font-size: 20px;
+  line-height: 150%;
+  font-size: 16px;
+`;
+
+const EmptyDataImage = styled.img`
+  width: 55px;
+  opacity: 0.5;
 `;
 
 export default Main;
