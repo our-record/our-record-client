@@ -4,6 +4,7 @@ import LinkCopy from '../../components/Information/LinkCopy';
 import styled from 'styled-components';
 import { buttonSet, flexSet } from '../../styles/mixin';
 import axios from 'axios';
+import { API } from '../../config';
 
 const Information = () => {
   const [today, setToday] = useState();
@@ -42,8 +43,14 @@ const Information = () => {
   const checkInformation = e => {
     e.preventDefault();
 
-    const conditions = hangoutDate && birthDay && birthDay && profileImage;
-    conditions ? submitInformation() : setInputNotification(true);
+    if (location.search.length !== 0) {
+      const invitorCondition =
+        hangoutDate && birthDay && birthDay && profileImage;
+      invitorCondition ? submitInformation() : setInputNotification(true);
+    } else {
+      const inviteeCondition = invitedBirthday && invitedNickName;
+      inviteeCondition ? submitInformation() : setInputNotification(true);
+    }
   };
 
   const submitInformation = () => {
@@ -63,23 +70,15 @@ const Information = () => {
       console.log(key);
     }
 
-    location.search.length !== 0
-      ? axios({
-          url: 'http://10.58.3.226:4000/user/register-info',
-          method: 'post',
-          data: userData,
-        }).then(res => {
-          alert('정보 입력이 완료되었습니다');
-          history.push('/');
-        })
-      : axios({
-          url: 'http://10.58.3.226:4000/user/register-info',
-          method: 'post',
-          data: userData,
-        }).then(res => {
-          alert('정보 입력이 완료되었습니다');
-          history.push('/');
-        });
+    axios({
+      url: `http://${API}/user/register-info`,
+      method: 'post',
+      headers: { _id: location.search.slice(6) },
+      data: userData,
+    }).then(res => {
+      alert('정보 입력이 완료되었습니다');
+      history.push('/');
+    });
   };
 
   return (
@@ -87,94 +86,116 @@ const Information = () => {
       <ContentsWrap>
         <MainTitle>정보를 입력해 주세요</MainTitle>
         <form onSubmit={checkInformation} enctype="multipart/form-data">
-          {location.search.length !== 0 && (
-            <CategoryWrap>
-              <CategoryTitle>커플</CategoryTitle>
-              <InputWrap>
-                <ListWrap>
-                  <div>
-                    <Label>초대링크</Label>
-                    <LinkCopy
-                      text={`http://10.58.3.226:4000/kakao/${location.search.slice(
-                        6
-                      )}`}
+          {location.search.length !== 0 ? (
+            <>
+              <CategoryWrap>
+                <CategoryTitle>커플</CategoryTitle>
+                <InputWrap>
+                  <ListWrap>
+                    <div>
+                      <Label>초대링크</Label>
+                      <LinkCopy
+                        text={`http://${API}/kakao/${location.search.slice(6)}`}
+                      />
+                    </div>
+                    <LinkWrap>
+                      <InviteLink>
+                        {`http://${API}/kakao/${location.search.slice(6)}`}
+                      </InviteLink>
+                      <LinkNotice>
+                        (!) 상대방에게 초대링크를 보내주세요
+                      </LinkNotice>
+                    </LinkWrap>
+                  </ListWrap>
+                  <ListWrap>
+                    <Label>사귄날짜</Label>
+                    <DateInput
+                      type="date"
+                      value={hangoutDate}
+                      max={today}
+                      onChange={e => handleInformation(e, setHangoutDate)}
                     />
-                  </div>
-                  <LinkWrap>
-                    <InviteLink>
-                      {`http://10.58.3.226:4000/kakao/${location.search.slice(
-                        6
-                      )}`}
-                    </InviteLink>
-                    <LinkNotice>
-                      (!) 상대방에게 초대링크를 보내주세요
-                    </LinkNotice>
-                  </LinkWrap>
-                </ListWrap>
-                <ListWrap>
-                  <Label>사귄날짜</Label>
-                  <DateInput
-                    type="date"
-                    value={hangoutDate}
-                    max={today}
-                    onChange={e => handleInformation(e, setHangoutDate)}
-                  />
-                </ListWrap>
-                <ListWrap>
-                  <Label>프로필</Label>
-                  <ProfileInputWrap>
-                    <ProfileInputLabel htmlFor="profile">
-                      파일선택
-                    </ProfileInputLabel>
-                    <ProfileInput
-                      id="profile"
-                      type="file"
-                      accept="image/*"
-                      onChange={e => setProfileImage(e.target.files[0])}
+                  </ListWrap>
+                  <ListWrap>
+                    <Label>프로필</Label>
+                    <ProfileInputWrap>
+                      <ProfileInputLabel htmlFor="profile">
+                        파일선택
+                      </ProfileInputLabel>
+                      <ProfileInput
+                        id="profile"
+                        type="file"
+                        accept="image/*"
+                        onChange={e => setProfileImage(e.target.files[0])}
+                      />
+                      <ProfileName className={profileImage && 'profileNameOn'}>
+                        {profileImage && profileImage.name}
+                      </ProfileName>
+                    </ProfileInputWrap>
+                  </ListWrap>
+                </InputWrap>
+              </CategoryWrap>
+              <CategoryWrap>
+                <CategoryTitle>개인</CategoryTitle>
+                <InputWrap>
+                  {' '}
+                  <ListWrap>
+                    <Label>생년월일</Label>
+                    <DateInput
+                      type="date"
+                      max={today}
+                      defaultValue={birthDay}
+                      onChange={e => handleInformation(e, setBirthDay)}
                     />
-                    <ProfileName className={profileImage && 'profileNameOn'}>
-                      {profileImage && profileImage.name}
-                    </ProfileName>
-                  </ProfileInputWrap>
-                </ListWrap>
-              </InputWrap>
-            </CategoryWrap>
+                  </ListWrap>
+                  <ListWrap>
+                    <Label>닉네임</Label>
+                    <NickNameWrap>
+                      <NickNameInput
+                        type="text"
+                        placeholder="훌라춤감자맘"
+                        value={nickName}
+                        onChange={e => handleInformation(e, setNickName, true)}
+                      />
+                      <TextCount>{nickName.length}/8</TextCount>
+                    </NickNameWrap>
+                  </ListWrap>
+                </InputWrap>
+              </CategoryWrap>
+            </>
+          ) : (
+            <>
+              <CategoryWrap>
+                <CategoryTitle>개인</CategoryTitle>
+                <InputWrap>
+                  {' '}
+                  <ListWrap>
+                    <Label>생년월일</Label>
+                    <DateInput
+                      type="date"
+                      max={today}
+                      defaultValue={invitedBirthday}
+                      onChange={e => handleInformation(e, setInvitedBirthday)}
+                    />
+                  </ListWrap>
+                  <ListWrap>
+                    <Label>닉네임</Label>
+                    <NickNameWrap>
+                      <NickNameInput
+                        type="text"
+                        placeholder="훌라춤감자맘"
+                        value={invitedNickName}
+                        onChange={e =>
+                          handleInformation(e, setInvitedNickName, true)
+                        }
+                      />
+                      <TextCount>{invitedNickName.length}/8</TextCount>
+                    </NickNameWrap>
+                  </ListWrap>
+                </InputWrap>
+              </CategoryWrap>
+            </>
           )}
-          <CategoryWrap>
-            <CategoryTitle>개인</CategoryTitle>
-            <InputWrap>
-              {' '}
-              <ListWrap>
-                <Label>생년월일</Label>
-                <DateInput
-                  type="date"
-                  max={today}
-                  defaultValue={birthDay}
-                  onChange={e =>
-                    location.search.length !== 0
-                      ? handleInformation(e, setBirthDay)
-                      : handleInformation(e, setInvitedBirthday)
-                  }
-                />
-              </ListWrap>
-              <ListWrap>
-                <Label>닉네임</Label>
-                <NickNameWrap>
-                  <NickNameInput
-                    type="text"
-                    placeholder="훌라춤감자맘"
-                    value={nickName}
-                    onChange={e =>
-                      location.search.length !== 0
-                        ? handleInformation(e, setNickName, true)
-                        : handleInformation(e, setInvitedNickName, true)
-                    }
-                  />
-                  <TextCount>{nickName.length}/8</TextCount>
-                </NickNameWrap>
-              </ListWrap>
-            </InputWrap>
-          </CategoryWrap>
           <Notification className={inputNotification && 'noticeOn'}>
             내용을 모두 입력해 주세요!
           </Notification>

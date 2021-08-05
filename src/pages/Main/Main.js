@@ -4,6 +4,7 @@ import Record from '../../components/Record/Record';
 import Story from '../../components/Story/Story';
 import SearchPlace from '../../components/Main/Map/SearchPlace';
 import Calendar from 'react-calendar';
+import { API } from '../../config';
 import styled from 'styled-components';
 import 'react-calendar/dist/Calendar.css';
 import {
@@ -43,13 +44,17 @@ const Main = () => {
     setConvertedDate(`${year}-${month}-${date}`);
 
     axios({
-      url: 'http://localhost:3000/data/record/record.json',
+      url: `http://${API}`,
       method: 'get',
       body: convertedDate,
     }).then(res => {
-      setDailyRecordData(res.data.result);
-      calculateTotalCost(res.data.result);
-      setIsLoading(false);
+      if (res.data.result) {
+        setDailyRecordData(res.data.result);
+        calculateTotalCost(res.data.result);
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+      }
     });
   }, [calendarDate]);
 
@@ -84,7 +89,7 @@ const Main = () => {
     }
 
     axios({
-      url: 'http://10.58.3.226:4000/user/register-info',
+      url: `http://${API}/post/write`,
       method: 'post',
       data: recordData,
     }).then(res => {
@@ -128,7 +133,7 @@ const Main = () => {
     calculateTotalCost(filtered);
 
     axios({
-      url: 'http://10.58.3.226:4000/user/register-info',
+      url: `http://${API}/post/remove`,
       method: 'post',
       data: { convertedDate, id },
     }).then(res => {
@@ -145,13 +150,13 @@ const Main = () => {
     setIsStoryOpen(false);
   };
 
-  if (isLoading) {
-    return (
-      <div>
-        <h1>데이터를 불러오는 중입니다...</h1>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div>
+  //       <h1>데이터를 불러오는 중입니다...</h1>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
@@ -221,73 +226,77 @@ const Main = () => {
               recordMarkers={dailyRecordData}
             />
           </MapWrap>
-          <ListWrap>
-            <ListTitle>그 날의 기록</ListTitle>
-            <ListTable>
-              <colgroup>
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '10%' }} />
-              </colgroup>
-              <tr>
-                <TableHead>스토리</TableHead>
-                <TableHead>시간</TableHead>
-                <TableHead>장소</TableHead>
-                <TableHead>항목</TableHead>
-                <TableHead>내용</TableHead>
-                <TableHead>사용금액</TableHead>
-                <TableHead>삭제/수정</TableHead>
-              </tr>
-              {dailyRecordData.map(data => {
-                return (
-                  <tr key={data.id}>
-                    <TableData>
-                      <StoryImage
-                        id={data.id}
-                        alt="story"
-                        src="/icon/binoculars.png"
-                        onClick={e => {
-                          openStrory(e, data.id);
-                        }}
-                      />
-                      <Story
-                        isOpen={isStoryOpen}
-                        closeStory={closeStory}
-                        storyData={storyData}
-                      />
-                    </TableData>
-                    <TableData>{data.time}</TableData>
-                    <TableData>{data.place}</TableData>
-                    <TableData>{data.category}</TableData>
-                    <TableData>{data.content}</TableData>
-                    <TableData>{data.cost.toLocaleString()}원</TableData>
-                    <TableData>
-                      <DeleteImage
-                        id={data.id}
-                        alt="delete"
-                        src="/icon/delete.png"
-                        onClick={e => deleteRecord(e, data.id)}
-                      />
-                      <EditImage alt="edit" src="/icon/edit.png" />
-                    </TableData>
-                  </tr>
-                );
-              })}
-              <tr>
-                <BottomTableData colSpan="5">합계</BottomTableData>
-                <BottomTableData>
-                  {totalCost.toLocaleString()}원
-                </BottomTableData>
-                <BottomTableData className="allDeleteButton">
-                  전체삭제
-                </BottomTableData>
-              </tr>
-            </ListTable>
-          </ListWrap>
+          {dailyRecordData ? (
+            <ListWrap>
+              <ListTitle>그 날의 기록</ListTitle>
+              <ListTable>
+                <colgroup>
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '25%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '10%' }} />
+                </colgroup>
+                <tr>
+                  <TableHead>스토리</TableHead>
+                  <TableHead>시간</TableHead>
+                  <TableHead>장소</TableHead>
+                  <TableHead>항목</TableHead>
+                  <TableHead>내용</TableHead>
+                  <TableHead>사용금액</TableHead>
+                  <TableHead>삭제/수정</TableHead>
+                </tr>
+                {dailyRecordData.map(data => {
+                  return (
+                    <tr key={data._id}>
+                      <TableData>
+                        <StoryImage
+                          id={data._id}
+                          alt="story"
+                          src="/icon/binoculars.png"
+                          onClick={e => {
+                            openStrory(e, data._id);
+                          }}
+                        />
+                        <Story
+                          isOpen={isStoryOpen}
+                          closeStory={closeStory}
+                          storyData={storyData}
+                        />
+                      </TableData>
+                      <TableData>{data.time}</TableData>
+                      <TableData>{data.place}</TableData>
+                      <TableData>{data.category}</TableData>
+                      <TableData>{data.expenseInfo}</TableData>
+                      <TableData>{data.expense.toLocaleString()}원</TableData>
+                      <TableData>
+                        <DeleteImage
+                          id={data._id}
+                          alt="delete"
+                          src="/icon/delete.png"
+                          onClick={e => deleteRecord(e, data._id)}
+                        />
+                        <EditImage alt="edit" src="/icon/edit.png" />
+                      </TableData>
+                    </tr>
+                  );
+                })}
+                <tr>
+                  <BottomTableData colSpan="5">합계</BottomTableData>
+                  <BottomTableData>
+                    {totalCost.toLocaleString()}원
+                  </BottomTableData>
+                  <BottomTableData className="allDeleteButton">
+                    전체삭제
+                  </BottomTableData>
+                </tr>
+              </ListTable>
+            </ListWrap>
+          ) : (
+            <EmptyData>데이터가 없어요ㅠㅠ</EmptyData>
+          )}
         </ContentsWrap>
       </BodyWrap>
     </>
@@ -458,6 +467,11 @@ const DeleteImage = styled.img`
 const EditImage = styled.img`
   width: 16px;
   cursor: pointer;
+`;
+
+const EmptyData = styled.div`
+  text-align: center;
+  font-size: 20px;
 `;
 
 export default Main;
