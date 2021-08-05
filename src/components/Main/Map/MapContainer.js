@@ -34,8 +34,8 @@ const MapContainer = ({
             <div>${i + 1}</div>
           </div>`,
           position: new kakao.maps.LatLng(
-            recordMarkers[i].y,
-            recordMarkers[i].x
+            recordMarkers[i].latitude,
+            recordMarkers[i].longitude
           ),
           xAnchor: 0.5,
           yAnchor: 1,
@@ -43,8 +43,8 @@ const MapContainer = ({
         });
 
         points[i] = new kakao.maps.LatLng(
-          recordMarkers[i].y,
-          recordMarkers[i].x
+          recordMarkers[i].latitude,
+          recordMarkers[i].longitude
         );
       }
 
