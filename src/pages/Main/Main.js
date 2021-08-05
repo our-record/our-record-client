@@ -29,20 +29,23 @@ const Main = () => {
   const [placeName, setPlaceName] = useState();
   const [long, setLong] = useState();
   const [lat, setLat] = useState();
-  const [recordMarkers, setRecordMarkers] = useState();
+  const [dailyRecordData, setDailyRecordData] = useState();
+  const [leftRecordData, setLeftRecordData] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const year = calendarDate.getFullYear();
     const month = `0${calendarDate.getMonth() + 1}`.slice(-2);
     const date = `0${calendarDate.getDate()}`.slice(-2);
-
     setConvertedDate(`${year}-${month}-${date}`);
 
-    axios.get('http://localhost:3000/data/record/record.json').then(res => {
-      setRecordMarkers(res.data.result);
+    axios({
+      url: 'http://localhost:3000/data/record/record.json',
+      method: 'get',
+      body: convertedDate,
+    }).then(res => {
+      setDailyRecordData(res.data.result);
       calculateTotalCost(res.data.result);
-      console.log(res.data.result);
       setIsLoading(false);
     });
   }, [calendarDate]);
@@ -72,6 +75,10 @@ const Main = () => {
     recordData.append('cost', cost);
     recordData.append('picture', picture);
     recordData.append('story', story);
+
+    for (let value of recordData.values()) {
+      console.log(value);
+    }
 
     axios({
       url: 'http://10.58.3.226:4000/user/register-info',
@@ -105,13 +112,25 @@ const Main = () => {
   };
 
   const calculateTotalCost = data => {
-    let totalcost = 0;
-    for (let i = 0; i < data.length; i++) {
-      totalcost += data[i].cost;
-    }
-    console.log(typeof totalcost);
-    setTotalCost(totalCost);
-    console.log(typeof totalCost);
+    const sumResult = data.reduce((pre, crr) => pre + crr.cost, 0);
+    setTotalCost(sumResult);
+  };
+
+  const deleteRecord = (event, idx) => {
+    const filtered = dailyRecordData.filter(
+      data => data.time !== event.target.id
+    );
+
+    setDailyRecordData(filtered);
+    calculateTotalCost(filtered);
+
+    axios({
+      url: 'http://10.58.3.226:4000/user/register-info',
+      method: 'post',
+      data: idx,
+    }).then(res => {
+      alert('기록이 삭제되었습니다.');
+    });
   };
 
   if (isLoading) {
@@ -187,7 +206,7 @@ const Main = () => {
               setLat={setLat}
               calendarDate={calendarDate}
               convertedDate={convertedDate}
-              recordMarkers={recordMarkers}
+              recordMarkers={dailyRecordData}
             />
           </MapWrap>
           <ListWrap>
@@ -211,7 +230,7 @@ const Main = () => {
                 <TableHead>사용금액</TableHead>
                 <TableHead>삭제/수정</TableHead>
               </tr>
-              {recordMarkers.map(data => {
+              {dailyRecordData.map((data, index) => {
                 return (
                   <tr key={data.time}>
                     <TableData>
@@ -223,7 +242,12 @@ const Main = () => {
                     <TableData>{data.content}</TableData>
                     <TableData>{data.cost.toLocaleString()}원</TableData>
                     <TableData>
-                      <DeleteImage alt="delete" src="/icon/delete.png" />
+                      <DeleteImage
+                        id={data.time}
+                        alt="delete"
+                        src="/icon/delete.png"
+                        onClick={e => deleteRecord(e, index)}
+                      />
                       <EditImage alt="edit" src="/icon/edit.png" />
                     </TableData>
                   </tr>
@@ -231,7 +255,9 @@ const Main = () => {
               })}
               <tr>
                 <BottomTableData colSpan="5">합계</BottomTableData>
-                <BottomTableData>{totalCost}원</BottomTableData>
+                <BottomTableData>
+                  {totalCost.toLocaleString()}원
+                </BottomTableData>
                 <BottomTableData className="allDeleteButton">
                   전체삭제
                 </BottomTableData>
