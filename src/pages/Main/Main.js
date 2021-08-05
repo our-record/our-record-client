@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Record from '../../components/Record/Record';
+import Story from '../../components/Story/Story';
 import SearchPlace from '../../components/Main/Map/SearchPlace';
 import Calendar from 'react-calendar';
 import styled from 'styled-components';
@@ -32,6 +33,8 @@ const Main = () => {
   const [dailyRecordData, setDailyRecordData] = useState();
   const [leftRecordData, setLeftRecordData] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [isStoryOpen, setIsStoryOpen] = useState(false);
+  const [storyData, setStoryData] = useState();
 
   useEffect(() => {
     const year = calendarDate.getFullYear();
@@ -116,9 +119,9 @@ const Main = () => {
     setTotalCost(sumResult);
   };
 
-  const deleteRecord = (event, idx) => {
+  const deleteRecord = (event, id) => {
     const filtered = dailyRecordData.filter(
-      data => data.time !== event.target.id
+      data => data.id !== event.target.id
     );
 
     setDailyRecordData(filtered);
@@ -127,10 +130,19 @@ const Main = () => {
     axios({
       url: 'http://10.58.3.226:4000/user/register-info',
       method: 'post',
-      data: idx,
+      data: { convertedDate, id },
     }).then(res => {
       alert('기록이 삭제되었습니다.');
     });
+  };
+
+  const openStrory = event => {
+    setStoryData(dailyRecordData.filter(data => data.time === event.target.id));
+    setIsStoryOpen(true);
+  };
+
+  const closeStory = () => {
+    setIsStoryOpen(false);
   };
 
   if (isLoading) {
@@ -230,11 +242,23 @@ const Main = () => {
                 <TableHead>사용금액</TableHead>
                 <TableHead>삭제/수정</TableHead>
               </tr>
-              {dailyRecordData.map((data, index) => {
+              {dailyRecordData.map(data => {
                 return (
-                  <tr key={data.time}>
+                  <tr key={data.id}>
                     <TableData>
-                      <StoryImage alt="story" src="/icon/binoculars.png" />
+                      <StoryImage
+                        id={data.id}
+                        alt="story"
+                        src="/icon/binoculars.png"
+                        onClick={e => {
+                          openStrory(e, data.id);
+                        }}
+                      />
+                      <Story
+                        isOpen={isStoryOpen}
+                        closeStory={closeStory}
+                        storyData={storyData}
+                      />
                     </TableData>
                     <TableData>{data.time}</TableData>
                     <TableData>{data.place}</TableData>
@@ -243,10 +267,10 @@ const Main = () => {
                     <TableData>{data.cost.toLocaleString()}원</TableData>
                     <TableData>
                       <DeleteImage
-                        id={data.time}
+                        id={data.id}
                         alt="delete"
                         src="/icon/delete.png"
-                        onClick={e => deleteRecord(e, index)}
+                        onClick={e => deleteRecord(e, data.id)}
                       />
                       <EditImage alt="edit" src="/icon/edit.png" />
                     </TableData>
