@@ -4,6 +4,7 @@ import { buttonSet, flexSet } from '../../styles/mixin';
 
 const Record = props => {
   const {
+    recordId,
     isOpen,
     time,
     setTime,
@@ -36,7 +37,7 @@ const Record = props => {
   };
 
   return (
-    <div>
+    <>
       {isOpen ? (
         <RecordWrap>
           <ContentsWrap>
@@ -112,18 +113,22 @@ const Record = props => {
                   onChange={e => handleData(e, setStory)}
                 />
               </ListWrap>
-              <Notification className={notice && 'noticeOn'}>
+              <Notification className={notice ? 'noticeOn' : ''}>
                 필수 내용을 입력해 주세요!
               </Notification>
               <div>
-                <EnrollButton type="submit">등록</EnrollButton>
+                {!recordId ? (
+                  <EnrollButton type="submit">등록</EnrollButton>
+                ) : (
+                  <EnrollButton type="submit">수정</EnrollButton>
+                )}
                 <CancleButton onClick={close}>취소</CancleButton>
               </div>
             </form>
           </ContentsWrap>
         </RecordWrap>
       ) : null}
-    </div>
+    </>
   );
 };
 
@@ -135,7 +140,7 @@ const RecordWrap = styled.div`
   bottom: 0;
   left: 0;
   z-index: 999;
-  background-color: rgba(120, 120, 120, 0.8);
+  background-color: rgba(120, 120, 120, 0.4);
 `;
 
 const ContentsWrap = styled.div`

@@ -11,8 +11,8 @@ const Story = props => {
         <StoryWrap>
           <ContentsWrap>
             <CloseButton onClick={closeStory}>닫기 X</CloseButton>
-            <StoryImage alt="story" src={`${storyData.datePhoto}`} />
-            <StoryText>{storyData.story}</StoryText>
+            <StoryImage alt="story" src={`${storyData[0].datePhoto}`} />
+            <StoryText>{storyData[0].story}</StoryText>
           </ContentsWrap>
         </StoryWrap>
       ) : null}
