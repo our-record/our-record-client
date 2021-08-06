@@ -3,6 +3,7 @@ import axios from 'axios';
 import Record from '../../components/Record/Record';
 import Story from '../../components/Story/Story';
 import SearchPlace from '../../components/Main/Map/SearchPlace';
+import Settings from '../../components/Main/Settings/Settings';
 import Calendar from 'react-calendar';
 import styled from 'styled-components';
 import 'react-calendar/dist/Calendar.css';
@@ -37,6 +38,7 @@ const Main = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyData, setStoryData] = useState();
+  const [isSettingsOpen, setIsSettingsOpen] = useState();
 
   useEffect(() => {
     const year = calendarDate.getFullYear();
@@ -197,7 +199,14 @@ const Main = () => {
           </AlarmMessageWrap>
           <div>
             <HomeButton alt="home button" src="/icon/home-black.png" />
-            <SettingButton alt="settings button" src="/icon/settings.png" />
+            <SettingButton
+              alt="settings button"
+              src="/icon/settings.png"
+              onClick={() => setIsSettingsOpen(true)}
+            />
+            {isSettingsOpen && (
+              <Settings isOpen={isSettingsOpen} setOpen={setIsSettingsOpen} />
+            )}
           </div>
         </RightWrap>
       </NavWrap>
