@@ -37,7 +37,6 @@ const Main = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyData, setStoryData] = useState();
-  const [categoryValue, setCategoryValue] = useState();
 
   useEffect(() => {
     const year = calendarDate.getFullYear();
@@ -50,7 +49,7 @@ const Main = () => {
 
   const showRecord = () => {
     axios({
-      url: 'http://localhost:3000/data/record/record.json',
+      url: `http://localhost:3000/data/record/record.json`,
       method: 'get',
       data: convertedDate,
     }).then(res => {
@@ -65,41 +64,43 @@ const Main = () => {
     isCost
       ? setData(value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '1'))
       : setData(value);
-
-    console.log(time);
   };
 
   const submitRecord = e => {
     e.preventDefault();
 
-    const conditions =
-      time && costContent && cost && (costCategory || categoryValue);
+    const conditions = time && costContent && cost && costCategory;
 
     conditions
-      ? window.confirm('기록을 등록하시겠습니까?') && enrollRecord(recordId)
+      ? window.confirm('기록을 등록하시겠습니까?') && enrollRecord()
       : setNotice(true);
   };
 
-  const enrollRecord = recordId => {
+  const enrollRecord = () => {
     const recordData = new FormData();
 
-    recordId
-      ? recordData.append('_id', recordId)
-      : recordData.append('datePhoto', picture);
+    if (recordId) {
+      recordData.append('_id', recordId);
+      picture && recordData.append('datePhoto', picture);
+    } else {
+      recordData.append('datePhoto', picture);
+      recordData.append('date', convertedDate);
+      recordData.append('longitude', long);
+      recordData.append('latitude', lat);
+    }
 
-    recordData.append('_id', recordId);
     recordData.append('time', time);
     recordData.append('costCategory', costCategory);
     recordData.append('costContent', costContent);
     recordData.append('cost', cost);
     recordData.append('story', story);
 
-    for (let value of recordData.values()) {
-      console.log(value);
-    }
+    // for (let value of recordData.values()) {
+    //   console.log(value);
+    // }
 
     axios({
-      url: `http://${API}/post/write`,
+      url: `http://${API}/post/${recordId ? `write` : `edit`}`,
       method: 'post',
       data: recordData,
     }).then(res => {
@@ -123,7 +124,6 @@ const Main = () => {
   const initializeRecord = () => {
     setTime('');
     setCostCategory('');
-    setCategoryValue('');
     setCostContent('');
     setCost('');
     setPicture('');
@@ -170,10 +170,9 @@ const Main = () => {
 
     setRecordId(selectedRecord._id);
     setTime(selectedRecord.time);
-    setCategoryValue(COST_CATEGORY[selectedRecord.category]);
+    setCostCategory(COST_CATEGORY[selectedRecord.category]);
     setCostContent(selectedRecord.expenseInfo);
     setCost(selectedRecord.expense);
-    setPicture(selectedRecord.datePhoto);
     setStory(selectedRecord.story);
     setPlaceName(selectedRecord.place);
     setIsRecordEditOpen(true);
@@ -260,13 +259,13 @@ const Main = () => {
               <ListTitle>그 날의 기록</ListTitle>
               <ListTable>
                 <tr>
-                  <TableHead style={{ width: '10%' }}>스토리</TableHead>
-                  <TableHead style={{ width: '10%' }}>시간</TableHead>
-                  <TableHead style={{ width: '15%' }}>장소</TableHead>
-                  <TableHead style={{ width: '10%' }}>항목</TableHead>
-                  <TableHead style={{ width: '25%' }}>내용</TableHead>
-                  <TableHead style={{ width: '10%' }}>사용금액</TableHead>
-                  <TableHead style={{ width: '10%' }}>삭제/수정</TableHead>
+                  <TableHead style={{ width: '7%' }}>스토리</TableHead>
+                  <TableHead style={{ width: '8%' }}>시간</TableHead>
+                  <TableHead style={{ width: '18%' }}>장소</TableHead>
+                  <TableHead style={{ width: '9%' }}>항목</TableHead>
+                  <TableHead style={{ width: '27%' }}>내용</TableHead>
+                  <TableHead style={{ width: '13%' }}>사용금액</TableHead>
+                  <TableHead style={{ width: '8%' }}>삭제/수정</TableHead>
                 </tr>
                 {dailyRecordData.map(data => {
                   return (
@@ -309,7 +308,7 @@ const Main = () => {
                           recordId={recordId}
                           time={time}
                           setTime={setTime}
-                          costCategory={categoryValue}
+                          costCategory={costCategory}
                           setCostCategory={setCostCategory}
                           costContent={costContent}
                           setCostContent={setCostContent}

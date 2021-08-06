@@ -20,7 +20,7 @@
             "place": "팔달산", 
             "latitude": 37.28073906027534,
             "longitude" : 127.01017663391963,
-            "category": "식비",
+            "category": "문화비",
             "expenseInfo": "커피",
             "expense": 10000,
             "datePhoto" : "/icon/heart.png",
