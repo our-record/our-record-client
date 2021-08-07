@@ -1,4 +1,4 @@
-export const API = '192.168.1.12:4000';
+export const API = '192.168.10.162:4000';
 
 export const COST_CATEGORY = {
   식비: '1',

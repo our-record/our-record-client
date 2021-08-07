@@ -1,0 +1,55 @@
+{
+    "data" : [
+        {
+            "post" : [
+                {
+                "_id" : "1111",
+                "date" :"2021-07-28t16:14:00",
+                "time":"13:14",
+                "place": "여장군 본점", 
+                "latitude": 37.3276192866202,
+                "longitude" : 127.109481919953,
+                "category": "식비",
+                "expenseInfo": "고기 5인분",
+                "expense": 50000,
+                "datePhoto" : "/icon/add.png",
+                "story" : "꺄아아아11"
+                }, 
+                {
+                "_id" : "2222",
+                "date" :"2021-07-28t16:15:00",
+                "time":"16:15",
+                "place": "팔달산", 
+                "latitude": 37.28073906027534,
+                "longitude" : 127.01017663391963,
+                "category": "문화비",
+                "expenseInfo": "커피",
+                "expense": 10000,
+                "datePhoto" : "/icon/heart.png",
+                "story" : "꺄아아아22"
+                }, 
+                {
+                "_id" : "3333",
+                "date" :"2021-07-28t16:16:00",
+                "time":"19:16",
+                "place": "샤누아", 
+                "latitude": 37.3961767,
+                "longitude" : 126.9657222,
+                "category": "식비",
+                "expenseInfo": "아이스크림",
+                "expense": 8800,
+                "datePhoto" : "/icon/logout.png",
+                "story" : "꺄아아아33"
+                }
+            ],
+            "user" : {
+                "dday" : "123", 
+                "invitor_birth" : "123",
+                "invitee_birth" : "123",
+                "couple_img" : "/images/main/meongmoongs.png",
+                "invitor_nickname": "테스트111",
+                "invitee_nickname": "테스트222"
+            }
+        }
+    ]
+}

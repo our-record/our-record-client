@@ -24,6 +24,7 @@ const Settings = ({ isOpen, setOpen }) => {
     axios({
       url: `http://${API}/user/logout`,
       method: 'get',
+      withCredentials: true,
     }).then(res => {
       alert('로그아웃 되었습니다.');
       history.push('/register');

@@ -75,6 +75,7 @@ const Information = () => {
       method: 'post',
       headers: { _id: location.search.slice(6) },
       data: userData,
+      withCredentials: true,
     }).then(res => {
       alert('정보 입력이 완료되었습니다');
       history.push('/');
