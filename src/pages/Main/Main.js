@@ -74,7 +74,7 @@ const Main = () => {
     }).then(res => {
       if (res.data[0].post) {
         setDailyRecordData(res.data[0].post);
-        calculateTotalCost(res.data);
+        calculateTotalCost(res.data[0].post);
       } else {
         setDailyRecordData('');
       }
@@ -134,6 +134,7 @@ const Main = () => {
       withCredentials: true,
     }).then(res => {
       alert('정보 입력이 완료되었습니다');
+      getRecord();
       closeRecord();
     });
   };
@@ -224,6 +225,14 @@ const Main = () => {
     setStory(selectedRecord.story);
     setPlaceName(selectedRecord.place);
     setIsRecordEditOpen(true);
+  };
+
+  const getRecord = () => {
+    axios({
+      url: `http://${API}/post/list`,
+      method: 'post',
+      data: convertedDate,
+    }).then(res => setDailyRecordData(res.data));
   };
 
   if (isLoading) {
