@@ -67,7 +67,7 @@ const MapContainer = ({
       polyLine.setMap(map);
     };
 
-    recordMarkers && setRecordMarkers(recordMarkers);
+    recordMarkers.length !== 0 && setRecordMarkers(recordMarkers);
 
     const ps = new kakao.maps.services.Places();
 

@@ -40,11 +40,6 @@ const Main = () => {
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyData, setStoryData] = useState();
   const [isSettingsOpen, setIsSettingsOpen] = useState();
-  // 백엔드 통신 전 test용
-  const [couple_img, setcoupleImg] = useState();
-  const [invitor, setInvitor] = useState();
-  const [invitee, setInvitee] = useState();
-  const [dday, setDday] = useState();
 
   useEffect(() => {
     const year = calendarDate.getFullYear();
@@ -52,22 +47,22 @@ const Main = () => {
     const date = `0${calendarDate.getDate()}`.slice(-2);
     setConvertedDate(`${year}-${month}-${date}`);
 
-    showRecord();
+    // showRecord();
     // json파일로 작업하기 위한 코드
-    // axios({
-    //   url: 'http://localhost:3000/data/main/record.json',
-    //   method: 'get',
-    // }).then(res => {
-    //   console.log(res.data.data[0]);
-    //   if (res.data.data[0].post) {
-    //     setDailyRecordData(res.data.data[0].post);
-    //     calculateTotalCost(res.data.data[0].post);
-    //   } else {
-    //     setDailyRecordData('');
-    //   }
-    //   setCoupleData(res.data.data[0].user);
-    //   setIsLoading(false);
-    // });
+    axios({
+      url: 'http://localhost:3000/data/main/record.json',
+      method: 'get',
+    }).then(res => {
+      console.log(res.data.data[0]);
+      if (res.data.data[0].post) {
+        setDailyRecordData(res.data.data[0].post);
+        calculateTotalCost(res.data.data[0].post);
+      } else {
+        setDailyRecordData('');
+      }
+      setCoupleData(res.data.data[0].user);
+      setIsLoading(false);
+    });
   }, [calendarDate]);
 
   const showRecord = () => {
@@ -173,21 +168,38 @@ const Main = () => {
   };
 
   const deleteRecord = (event, id) => {
-    const filtered = dailyRecordData.filter(
-      data => data._id !== event.target.id
-    );
+    if (window.confirm('기록을 삭제하시겠습니까?')) {
+      const filtered = dailyRecordData.filter(
+        data => data._id !== event.target.id
+      );
 
-    setDailyRecordData(filtered);
-    calculateTotalCost(filtered);
+      setDailyRecordData(filtered);
+      calculateTotalCost(filtered);
 
-    axios({
-      url: `http://${API}/post/remove`,
-      method: 'post',
-      data: { convertedDate, id },
-      withCredentials: true,
-    }).then(res => {
-      alert('기록이 삭제되었습니다.');
-    });
+      axios({
+        url: `http://${API}/post/remove`,
+        method: 'post',
+        data: { convertedDate, id },
+        withCredentials: true,
+      }).then(res => {
+        alert('기록이 삭제되었습니다.');
+      });
+    }
+  };
+
+  const deleteAllRecord = () => {
+    if (window.confirm('기록 전체를 삭제하시겠습니까?')) {
+      setDailyRecordData('');
+
+      axios({
+        url: `http://${API}/post/remove-all`,
+        method: 'post',
+        data: convertedDate,
+        withCredentials: true,
+      }).then(res => {
+        alert('기록이 삭제되었습니다.');
+      });
+    }
   };
 
   const openStory = (event, id) => {
@@ -248,22 +260,26 @@ const Main = () => {
         <SideWrap>
           <ProfileImage
             alt="profile"
-            src={`${couple_img ? couple_img : '/icon/couple.png'}`}
+            src={`${
+              coupleData && coupleData.couple_img
+                ? coupleData.couple_img
+                : '/icon/couple.png'
+            }`}
           />
           <NickNameWrap>
-            {coupleData.invitor_nickname ? (
+            {coupleData && coupleData.invitor_nickname ? (
               <NickName>{coupleData.invitor_nickname}</NickName>
             ) : (
               <NoNickName> 등록해 주세요</NoNickName>
             )}
             <HeartIcon alt="heart" src="/icon/heart.png" />{' '}
-            {coupleData.invitee_nickname ? (
+            {coupleData && coupleData.invitee_nickname ? (
               <NickName>{coupleData.invitee_nickname}</NickName>
             ) : (
               <NoNickName> 등록해 주세요</NoNickName>
             )}
           </NickNameWrap>
-          <DDay>{dday ? 'D + 100일' : ''}</DDay>
+          <DDay>{coupleData && coupleData.dday ? 'D + 100일' : ''}</DDay>
           <RecordCalendar>
             <Calendar
               value={calendarDate}
@@ -308,7 +324,7 @@ const Main = () => {
               recordMarkers={dailyRecordData}
             />
           </MapWrap>
-          {dailyRecordData ? (
+          {dailyRecordData.length !== 0 ? (
             <ListWrap>
               <ListTitle>그 날의 기록</ListTitle>
               <ListTable>
@@ -325,22 +341,28 @@ const Main = () => {
                   return (
                     <tr key={data._id}>
                       <TableData>
-                        <StoryImage
-                          id={data._id}
-                          alt="story"
-                          src="/icon/binoculars.png"
-                          onClick={e => {
-                            openStory(e, data._id);
-                          }}
-                        />
-                        <Story
-                          isOpen={isStoryOpen}
-                          closeStory={closeStory}
-                          storyData={storyData}
-                        />
+                        {data.datePhoto || data.story ? (
+                          <>
+                            <StoryImage
+                              id={data._id}
+                              alt="story"
+                              src="/icon/binoculars.png"
+                              onClick={e => {
+                                openStory(e, data._id);
+                              }}
+                            />
+                            <Story
+                              isOpen={isStoryOpen}
+                              closeStory={closeStory}
+                              storyData={storyData}
+                            />
+                          </>
+                        ) : (
+                          `-`
+                        )}
                       </TableData>
                       <TableData>{data.time}</TableData>
-                      <TableData>{data.place}</TableData>
+                      <TableData>{data.place ? data.place : `-`}</TableData>
                       <TableData>{data.category}</TableData>
                       <TableData>{data.expenseInfo}</TableData>
                       <TableData>{data.expense.toLocaleString()}원</TableData>
@@ -388,7 +410,10 @@ const Main = () => {
                   <BottomTableData>
                     {totalCost.toLocaleString()}원
                   </BottomTableData>
-                  <BottomTableData className="allDeleteButton">
+                  <BottomTableData
+                    className="allDeleteButton"
+                    onClick={() => deleteAllRecord()}
+                  >
                     전체삭제
                   </BottomTableData>
                 </tr>
