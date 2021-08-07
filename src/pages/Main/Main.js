@@ -35,10 +35,16 @@ const Main = () => {
   const [long, setLong] = useState();
   const [lat, setLat] = useState();
   const [dailyRecordData, setDailyRecordData] = useState();
+  const [coupleData, setCoupleData] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyData, setStoryData] = useState();
   const [isSettingsOpen, setIsSettingsOpen] = useState();
+  // 백엔드 통신 전 test용
+  const [couple_img, setcoupleImg] = useState();
+  const [invitor, setInvitor] = useState();
+  const [invitee, setInvitee] = useState();
+  const [dday, setDday] = useState();
 
   useEffect(() => {
     const year = calendarDate.getFullYear();
@@ -47,16 +53,37 @@ const Main = () => {
     setConvertedDate(`${year}-${month}-${date}`);
 
     showRecord();
+    // json파일로 작업하기 위한 코드
+    // axios({
+    //   url: 'http://localhost:3000/data/main/record.json',
+    //   method: 'get',
+    // }).then(res => {
+    //   console.log(res.data.data[0]);
+    //   if (res.data.data[0].post) {
+    //     setDailyRecordData(res.data.data[0].post);
+    //     calculateTotalCost(res.data.data[0].post);
+    //   } else {
+    //     setDailyRecordData('');
+    //   }
+    //   setCoupleData(res.data.data[0].user);
+    //   setIsLoading(false);
+    // });
   }, [calendarDate]);
 
   const showRecord = () => {
     axios({
-      url: `http://localhost:3000/data/record/record.json`,
-      method: 'get',
+      url: `http://${API}/`,
+      method: 'post',
       data: convertedDate,
+      withCredentials: true,
     }).then(res => {
-      setDailyRecordData(res.data.result);
-      calculateTotalCost(res.data.result);
+      if (res.data[0].post) {
+        setDailyRecordData(res.data[0].post);
+        calculateTotalCost(res.data);
+      } else {
+        setDailyRecordData('');
+      }
+      setCoupleData(res.data[0].user);
       setIsLoading(false);
     });
   };
@@ -66,6 +93,13 @@ const Main = () => {
     isCost
       ? setData(value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '1'))
       : setData(value);
+  };
+
+  const getDDay = () => {
+    const year = calendarDate.getFullYear();
+    const month = `0${calendarDate.getMonth() + 1}`.slice(-2);
+    const date = `0${calendarDate.getDate()}`.slice(-2);
+    setConvertedDate(`${year}-${month}-${date}`);
   };
 
   const submitRecord = e => {
@@ -85,6 +119,7 @@ const Main = () => {
       recordData.append('_id', recordId);
       picture && recordData.append('datePhoto', picture);
     } else {
+      recordData.append('place', placeName);
       recordData.append('datePhoto', picture);
       recordData.append('date', convertedDate);
       recordData.append('longitude', long);
@@ -92,19 +127,16 @@ const Main = () => {
     }
 
     recordData.append('time', time);
-    recordData.append('costCategory', costCategory);
-    recordData.append('costContent', costContent);
-    recordData.append('cost', cost);
+    recordData.append('category', costCategory);
+    recordData.append('expenseInfo', costContent);
+    recordData.append('expense', cost);
     recordData.append('story', story);
 
-    // for (let value of recordData.values()) {
-    //   console.log(value);
-    // }
-
     axios({
-      url: `http://${API}/post/${recordId ? `write` : `edit`}`,
+      url: `http://${API}/post/${recordId ? `edit` : `write`}`,
       method: 'post',
       data: recordData,
+      withCredentials: true,
     }).then(res => {
       alert('정보 입력이 완료되었습니다');
       closeRecord();
@@ -124,13 +156,14 @@ const Main = () => {
   };
 
   const initializeRecord = () => {
-    setTime('');
-    setCostCategory('');
-    setCostContent('');
-    setCost('');
-    setPicture('');
-    setStory('');
-    setRecordId('');
+    setTime();
+    setCostCategory();
+    setCostContent();
+    setCost();
+    setPicture();
+    setStory();
+    setRecordId();
+    setRecordId();
     setNotice(false);
   };
 
@@ -151,6 +184,7 @@ const Main = () => {
       url: `http://${API}/post/remove`,
       method: 'post',
       data: { convertedDate, id },
+      withCredentials: true,
     }).then(res => {
       alert('기록이 삭제되었습니다.');
     });
@@ -212,13 +246,24 @@ const Main = () => {
       </NavWrap>
       <BodyWrap>
         <SideWrap>
-          <ProfileImage alt="profile" src="/images/main/meongmoongs.png" />
+          <ProfileImage
+            alt="profile"
+            src={`${couple_img ? couple_img : '/icon/couple.png'}`}
+          />
           <NickNameWrap>
-            <span>훌라춤감자맘</span>
+            {coupleData.invitor_nickname ? (
+              <NickName>{coupleData.invitor_nickname}</NickName>
+            ) : (
+              <NoNickName> 등록해 주세요</NoNickName>
+            )}
             <HeartIcon alt="heart" src="/icon/heart.png" />{' '}
-            <span>콧수염아저씨</span>
+            {coupleData.invitee_nickname ? (
+              <NickName>{coupleData.invitee_nickname}</NickName>
+            ) : (
+              <NoNickName> 등록해 주세요</NoNickName>
+            )}
           </NickNameWrap>
-          <DDay>D + 100일</DDay>
+          <DDay>{dday ? 'D + 100일' : ''}</DDay>
           <RecordCalendar>
             <Calendar
               value={calendarDate}
@@ -263,7 +308,7 @@ const Main = () => {
               recordMarkers={dailyRecordData}
             />
           </MapWrap>
-          {dailyRecordData.length !== 0 ? (
+          {dailyRecordData ? (
             <ListWrap>
               <ListTitle>그 날의 기록</ListTitle>
               <ListTable>
@@ -437,7 +482,17 @@ const ProfileImage = styled.img`
 const NickNameWrap = styled.div`
   ${flexSet('row', 'center', 'center')}
   margin: 10px 0;
-  font-size: 14px;
+  font-size: 13px;
+`;
+
+const NickName = styled.span`
+  font-weight: bold;
+  color: ${props => props.theme.basicDarkGray};
+`;
+
+const NoNickName = styled.span`
+  color: ${props => props.theme.basicGray};
+  text-decoration: underline;
 `;
 
 const HeartIcon = styled.img`
