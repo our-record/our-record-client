@@ -7,7 +7,10 @@ import axios from 'axios';
 import { API } from '../../config';
 
 const Information = () => {
+  const location = useLocation();
+  const history = useHistory();
   const [today, setToday] = useState();
+  const [coupleId, setCoupleId] = useState(location.search.slice(6));
   const [hangoutDate, setHangoutDate] = useState('');
   const [birthDay, setBirthDay] = useState('');
   const [invitedBirthday, setInvitedBirthday] = useState('');
@@ -15,8 +18,8 @@ const Information = () => {
   const [invitedNickName, setInvitedNickName] = useState('');
   const [profileImage, setProfileImage] = useState();
   const [inputNotification, setInputNotification] = useState(false);
-  const location = useLocation();
-  const history = useHistory();
+  const isInvitor = location.search.length !== 0;
+  const isEdit = location.pathname === '/information_edit';
 
   useEffect(() => {
     let now = new Date();
@@ -33,22 +36,44 @@ const Information = () => {
     }
 
     setToday(`${year}-${month}-${date}`);
+
+    isEdit &&
+      axios({
+        url: `http://${API}/user/register-info`,
+        method: 'get',
+        withCredentials: true,
+      }).then(res => {
+        const { data } = res;
+        setCoupleId(data._id);
+        setNickName(data.invitor_nickname);
+        setInvitedNickName(data.invitee_nickname);
+
+        data.dday && setHangoutDate(data.dday.substring(0, 10));
+        data.invitor_birth && setBirthDay(data.invitor_birth.substring(0, 10));
+        data.invitee_birth &&
+          setInvitedBirthday(data.invitee_birth.substring(0, 10));
+      });
   }, []);
 
   const handleInformation = (event, setData, validation) => {
     const { value } = event.target;
-    validation ? value.length < 7 && setData(value) : setData(value);
+    validation ? value.length < 9 && setData(value) : setData(value);
   };
 
   const checkInformation = e => {
     e.preventDefault();
 
-    if (location.search.length !== 0) {
-      const invitorCondition =
-        hangoutDate && birthDay && birthDay && profileImage;
+    const inviteeCondition = invitedBirthday && invitedNickName;
+    const editCondition = hangoutDate && birthDay && birthDay;
+    const invitorCondition = editCondition && profileImage;
+
+    if (isEdit) {
+      editCondition && inviteeCondition
+        ? submitInformation()
+        : setInputNotification(true);
+    } else if (isInvitor) {
       invitorCondition ? submitInformation() : setInputNotification(true);
     } else {
-      const inviteeCondition = invitedBirthday && invitedNickName;
       inviteeCondition ? submitInformation() : setInputNotification(true);
     }
   };
@@ -56,19 +81,17 @@ const Information = () => {
   const submitInformation = () => {
     const userData = new FormData();
 
-    if (location.search.length !== 0) {
-      userData.append('dday', hangoutDate);
-      userData.append('invitor_birth', birthDay);
-      userData.append('couple_img', profileImage);
-      userData.append('invitor_nickname', nickName);
+    if (isEdit && !profileImage) {
+      return;
     } else {
-      userData.append('invitee_birth', invitedBirthday);
-      userData.append('invitee_nickname', invitedNickName);
+      userData.append('couple_img', profileImage);
     }
 
-    for (let key of userData.values()) {
-      console.log(key);
-    }
+    userData.append('dday', hangoutDate);
+    userData.append('invitor_birth', birthDay);
+    userData.append('invitor_nickname', nickName);
+    userData.append('invitee_birth', invitedBirthday);
+    userData.append('invitee_nickname', invitedNickName);
 
     axios({
       url: `http://${API}/user/register-info`,
@@ -79,15 +102,32 @@ const Information = () => {
     }).then(res => {
       alert('정보 입력이 완료되었습니다');
       history.push('/');
+      initializeData();
     });
+  };
+
+  const initializeData = () => {
+    setHangoutDate();
+    setInvitedBirthday();
+    setInvitedNickName();
+    setNickName();
+    setBirthDay();
+    setProfileImage();
+  };
+
+  const cancleEdit = () => {
+    if (window.confirm('수정을 취소하시겠습니까?')) {
+      history.goBack();
+      initializeData();
+    }
   };
 
   return (
     <InformationWrap>
       <ContentsWrap>
         <MainTitle>정보를 입력해 주세요</MainTitle>
-        <form onSubmit={checkInformation} enctype="multipart/form-data">
-          {location.search.length !== 0 ? (
+        <form onSubmit={e => checkInformation(e)} enctype="multipart/form-data">
+          {(isInvitor || isEdit) && (
             <>
               <CategoryWrap>
                 <CategoryTitle>커플</CategoryTitle>
@@ -95,16 +135,14 @@ const Information = () => {
                   <ListWrap>
                     <div>
                       <Label>초대링크</Label>
-                      <LinkCopy
-                        text={`http://${API}/kakao/${location.search.slice(6)}`}
-                      />
+                      <LinkCopy text={`http://${API}/kakao/${coupleId}`} />
                     </div>
                     <LinkWrap>
                       <InviteLink>
-                        {`http://${API}/kakao/${location.search.slice(6)}`}
+                        {`http://${API}/kakao/${coupleId}`}
                       </InviteLink>
                       <LinkNotice>
-                        (!) 상대방에게 초대링크를 보내주세요
+                        {isEdit ? `` : `(!) 상대방에게 초대링크를 보내주세요`}
                       </LinkNotice>
                     </LinkWrap>
                   </ListWrap>
@@ -137,7 +175,7 @@ const Information = () => {
                 </InputWrap>
               </CategoryWrap>
               <CategoryWrap>
-                <CategoryTitle>개인</CategoryTitle>
+                <CategoryTitle>사용자1</CategoryTitle>
                 <InputWrap>
                   {' '}
                   <ListWrap>
@@ -158,16 +196,19 @@ const Information = () => {
                         value={nickName}
                         onChange={e => handleInformation(e, setNickName, true)}
                       />
-                      <TextCount>{nickName.length}/8</TextCount>
+                      <TextCount>
+                        {nickName ? nickName.length : `0`}/8
+                      </TextCount>
                     </NickNameWrap>
                   </ListWrap>
                 </InputWrap>
               </CategoryWrap>
             </>
-          ) : (
+          )}
+          {!isInvitor && (
             <>
               <CategoryWrap>
-                <CategoryTitle>개인</CategoryTitle>
+                <CategoryTitle>사용자2</CategoryTitle>
                 <InputWrap>
                   {' '}
                   <ListWrap>
@@ -184,13 +225,15 @@ const Information = () => {
                     <NickNameWrap>
                       <NickNameInput
                         type="text"
-                        placeholder="훌라춤감자맘"
+                        placeholder="콧수염아저씨"
                         value={invitedNickName}
                         onChange={e =>
                           handleInformation(e, setInvitedNickName, true)
                         }
                       />
-                      <TextCount>{invitedNickName.length}/8</TextCount>
+                      <TextCount>
+                        {invitedNickName ? invitedNickName.length : `0`}/8
+                      </TextCount>
                     </NickNameWrap>
                   </ListWrap>
                 </InputWrap>
@@ -200,8 +243,9 @@ const Information = () => {
           <Notification className={inputNotification && 'noticeOn'}>
             내용을 모두 입력해 주세요!
           </Notification>
-          <SubmitButton type="submit">등록</SubmitButton>
+          <SubmitButton type="submit">{isEdit ? `수정` : `등록`}</SubmitButton>
         </form>
+        {isEdit && <CancleButton onClick={cancleEdit}> 취소 </CancleButton>}
       </ContentsWrap>
     </InformationWrap>
   );
@@ -350,6 +394,19 @@ const SubmitButton = styled.button`
   color: ${props => props.theme.basicDarkGray};
   background-color: ${props => props.theme.keyColor};
   box-shadow: 2px 2px #ffc7b5;
+  font-size: 16px;
+  cursor: pointer;
+`;
+
+const CancleButton = styled.button`
+  width: 100%;
+  margin: 10px 0 20px 0;
+  padding: 10px 0;
+  border: none;
+  border-radius: 3px;
+  color: ${props => props.theme.basicDarkGray};
+  background-color: ${props => props.theme.Gray};
+  box-shadow: 2px 2px ${props => props.theme.basicDarkGray};
   font-size: 16px;
   cursor: pointer;
 `;
