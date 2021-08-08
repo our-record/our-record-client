@@ -30,7 +30,7 @@ const Main = () => {
   const [totalCost, setTotalCost] = useState(0);
   const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
-  const [convertedDate, setConvertedDate] = useState();
+  const [convertedDate, setConvertedDate] = useState(new Date());
   const [placeName, setPlaceName] = useState();
   const [long, setLong] = useState();
   const [lat, setLat] = useState();
@@ -47,38 +47,39 @@ const Main = () => {
     const date = `0${calendarDate.getDate()}`.slice(-2);
     setConvertedDate(`${year}-${month}-${date}`);
 
-    // showRecord();
+    showRecord();
     // json파일로 작업하기 위한 코드
-    axios({
-      url: 'http://localhost:3000/data/main/record.json',
-      method: 'get',
-    }).then(res => {
-      console.log(res.data.data[0]);
-      if (res.data.data[0].post) {
-        setDailyRecordData(res.data.data[0].post);
-        calculateTotalCost(res.data.data[0].post);
-      } else {
-        setDailyRecordData('');
-      }
-      setCoupleData(res.data.data[0].user);
-      setIsLoading(false);
-    });
+    // axios({
+    //   url: 'http://localhost:3000/data/main/record.json',
+    //   method: 'get',
+    // }).then(res => {
+    //   console.log(res.data.data[0]);
+    //   if (res.data.data[0].post) {
+    //     setDailyRecordData(res.data.data[0].post);
+    //     calculateTotalCost(res.data.data[0].post);
+    //   } else {
+    //     setDailyRecordData('');
+    //   }
+    //   setCoupleData(res.data.data[0].user);
+    //   setIsLoading(false);
+    // });
   }, [calendarDate]);
 
-  const showRecord = () => {
-    axios({
+  const showRecord = async () => {
+    await axios({
       url: `http://${API}/`,
       method: 'post',
-      data: convertedDate,
+      data: { convertedDate },
       withCredentials: true,
     }).then(res => {
-      if (res.data[0].post) {
-        setDailyRecordData(res.data[0].post);
-        calculateTotalCost(res.data[0].post);
+      // console.log(res.data);
+      if (res.data[0]) {
+        setDailyRecordData(res.data[0]);
+        calculateTotalCost(res.data[0]);
       } else {
         setDailyRecordData('');
       }
-      setCoupleData(res.data[0].user);
+      setCoupleData(res.data[1]);
       setIsLoading(false);
     });
   };
@@ -195,7 +196,7 @@ const Main = () => {
       axios({
         url: `http://${API}/post/remove-all`,
         method: 'post',
-        data: convertedDate,
+        data: { convertedDate },
         withCredentials: true,
       }).then(res => {
         alert('기록이 삭제되었습니다.');
@@ -231,8 +232,12 @@ const Main = () => {
     axios({
       url: `http://${API}/post/list`,
       method: 'post',
-      data: convertedDate,
-    }).then(res => setDailyRecordData(res.data));
+      data: { convertedDate },
+      withCredentials: true,
+    }).then(res => {
+      console.log(res.data);
+      setDailyRecordData(res.data);
+    });
   };
 
   if (isLoading) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
 import { flexSet } from '../../../styles/mixin';
@@ -41,10 +41,12 @@ const Settings = ({ isOpen, setOpen }) => {
         <IconImage alt="information" src="/icon/anniversary.png" />
         <ButtonText>기념일 설정</ButtonText>
       </MenuWrap>
-      <MenuWrap onClick={() => logOut()}>
-        <IconImage alt="information" src="/icon/logout.png" />
-        <ButtonText>로그아웃</ButtonText>
-      </MenuWrap>
+      <a href="http://localhost:4000/user/logout">
+        <MenuWrap>
+          <IconImage alt="information" src="/icon/logout.png" />
+          <ButtonText>로그아웃</ButtonText>
+        </MenuWrap>
+      </a>
     </SettingsWrap>
   );
 };
