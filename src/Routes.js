@@ -10,7 +10,6 @@ import Story from './components/Story/Story';
 import GlobalStyle from './styles/GlobalStyle';
 import TestForm from './pages/Test/TestForm';
 import theme from './styles/theme';
-import Settings from './components/Main/Settings/Settings';
 
 const Routes = () => (
   <>
@@ -25,7 +24,7 @@ const Routes = () => (
           <Route exact path="/record" component={Record} />
           <Route exact path="/story" component={Story} />
           <Route exact path="/test" component={TestForm} />
-          <Route exact path="/settings" component={Settings} />
+          <Route exact path="/information_edit" component={Information} />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>

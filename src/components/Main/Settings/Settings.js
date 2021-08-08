@@ -33,7 +33,7 @@ const Settings = ({ isOpen, setOpen }) => {
 
   return (
     <SettingsWrap ref={settingsElement}>
-      <MenuWrap onClick={() => history.push('/information')}>
+      <MenuWrap onClick={() => history.push('/information_edit')}>
         <IconImage alt="information" src="/icon/information.png" />
         <ButtonText>정보 변경</ButtonText>
       </MenuWrap>
