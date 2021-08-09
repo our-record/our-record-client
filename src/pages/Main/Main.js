@@ -62,13 +62,13 @@ const Main = () => {
       }
 
       const coupleDate = new Date(res.data.data[0].user.dday);
+      const today = new Date();
       const calcDate = today.getTime() - coupleDate.getTime();
-
       setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
+
       setCoupleData(res.data.data[0].user);
       setIsLoading(false);
     });
-    const today = new Date();
   }, [calendarDate]);
 
   const showRecord = async () => {
@@ -84,7 +84,13 @@ const Main = () => {
       } else {
         setDailyRecordData('');
       }
-      setCoupleData(res.data[1]);
+
+      const coupleDate = new Date(res.data.data[0].user.dday);
+      const today = new Date();
+      const calcDate = today.getTime() - coupleDate.getTime();
+      setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
+
+      setCoupleData(res.data.data[0].user);
       setIsLoading(false);
     });
   };
