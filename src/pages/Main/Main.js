@@ -69,7 +69,7 @@ const Main = () => {
       setCoupleData(res.data.data[0].user);
       setIsLoading(false);
     });
-  }, [calendarDate]);
+  }, [calendarDate, convertedDate]);
 
   const showRecord = async () => {
     await axios({

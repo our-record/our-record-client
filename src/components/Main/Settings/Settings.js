@@ -9,16 +9,16 @@ const Settings = ({ isOpen, setOpen }) => {
   const history = useHistory();
   const settingsElement = useRef();
 
-  useEffect(() => {
-    window.addEventListener('click', handleClose);
-    return () => {
-      window.removeEventListener('click', handleClose);
-    };
-  }, []);
-
   const handleClose = ({ target }) => {
     if (isOpen && !settingsElement.current.contains(target)) setOpen(false);
   };
+
+  useEffect(() => {
+    window.addEventListener('mousedown', handleClose);
+    return () => {
+      window.removeEventListener('mousedown', handleClose);
+    };
+  }, []);
 
   return (
     <SettingsWrap ref={settingsElement}>
@@ -30,12 +30,12 @@ const Settings = ({ isOpen, setOpen }) => {
         <IconImage alt="information" src="/icon/anniversary.png" />
         <ButtonText>기념일 설정</ButtonText>
       </MenuWrap>
-      <a href={`http://${API}/user/logout`}>
+      <LinkEl href={`http://${API}/user/logout`}>
         <MenuWrap>
           <IconImage alt="information" src="/icon/logout.png" />
           <ButtonText>로그아웃</ButtonText>
         </MenuWrap>
-      </a>
+      </LinkEl>
     </SettingsWrap>
   );
 };
@@ -53,11 +53,14 @@ const SettingsWrap = styled.div`
 
 const MenuWrap = styled.div`
   ${flexSet('row', 'flex-start', 'center')}
-  margin-top: 7px;
   cursor: pointer;
 
   &:first-child {
-    margin-top: 0;
+    margin-bottom: 7px;
+  }
+
+  &:last-child {
+    margin-top: 7px;
   }
 
   &:hover > div {
@@ -74,6 +77,10 @@ const IconImage = styled.img`
   height: 15px;
   margin-right: 10px;
   opacity: 0.5;
+`;
+
+const LinkEl = styled.a`
+  text-decoration: none;
 `;
 
 const ButtonText = styled.div`
