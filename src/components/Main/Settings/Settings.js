@@ -20,17 +20,6 @@ const Settings = ({ isOpen, setOpen }) => {
     if (isOpen && !settingsElement.current.contains(target)) setOpen(false);
   };
 
-  const logOut = () => {
-    axios({
-      url: `http://${API}/user/logout`,
-      method: 'get',
-      withCredentials: true,
-    }).then(res => {
-      alert('로그아웃 되었습니다.');
-      history.push('/register');
-    });
-  };
-
   return (
     <SettingsWrap ref={settingsElement}>
       <MenuWrap onClick={() => history.push('/information_edit')}>
@@ -41,10 +30,12 @@ const Settings = ({ isOpen, setOpen }) => {
         <IconImage alt="information" src="/icon/anniversary.png" />
         <ButtonText>기념일 설정</ButtonText>
       </MenuWrap>
-      <MenuWrap onClick={() => logOut()}>
-        <IconImage alt="information" src="/icon/logout.png" />
-        <ButtonText>로그아웃</ButtonText>
-      </MenuWrap>
+      <a href={`http://${API}/user/logout`}>
+        <MenuWrap>
+          <IconImage alt="information" src="/icon/logout.png" />
+          <ButtonText>로그아웃</ButtonText>
+        </MenuWrap>
+      </a>
     </SettingsWrap>
   );
 };
