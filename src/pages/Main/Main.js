@@ -63,16 +63,15 @@ const Main = () => {
     //   setCoupleData(res.data.data[0].user);
     //   setIsLoading(false);
     // });
-  }, [calendarDate]);
+  }, [calendarDate, convertedDate]);
 
-  const showRecord = async () => {
-    await axios({
+  const showRecord = () => {
+    axios({
       url: `http://${API}/`,
       method: 'post',
       data: { convertedDate },
       withCredentials: true,
     }).then(res => {
-      // console.log(res.data);
       if (res.data[0]) {
         setDailyRecordData(res.data[0]);
         calculateTotalCost(res.data[0]);
