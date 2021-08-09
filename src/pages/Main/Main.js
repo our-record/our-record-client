@@ -30,7 +30,7 @@ const Main = () => {
   const [totalCost, setTotalCost] = useState(0);
   const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
-  const [convertedDate, setConvertedDate] = useState();
+  const [convertedDate, setConvertedDate] = useState(new Date());
   const [placeName, setPlaceName] = useState();
   const [long, setLong] = useState();
   const [lat, setLat] = useState();
@@ -65,20 +65,20 @@ const Main = () => {
     });
   }, [calendarDate]);
 
-  const showRecord = () => {
-    axios({
+  const showRecord = async () => {
+    await axios({
       url: `http://${API}/`,
       method: 'post',
-      data: convertedDate,
+      data: { convertedDate },
       withCredentials: true,
     }).then(res => {
-      if (res.data[0].post) {
-        setDailyRecordData(res.data[0].post);
-        calculateTotalCost(res.data[0].post);
+      if (res.data[0]) {
+        setDailyRecordData(res.data[0]);
+        calculateTotalCost(res.data[0]);
       } else {
         setDailyRecordData('');
       }
-      setCoupleData(res.data[0].user);
+      setCoupleData(res.data[1]);
       setIsLoading(false);
     });
   };
@@ -195,7 +195,7 @@ const Main = () => {
       axios({
         url: `http://${API}/post/remove-all`,
         method: 'post',
-        data: convertedDate,
+        data: { convertedDate },
         withCredentials: true,
       }).then(res => {
         alert('기록이 삭제되었습니다.');
@@ -231,7 +231,8 @@ const Main = () => {
     axios({
       url: `http://${API}/post/list`,
       method: 'post',
-      data: convertedDate,
+      data: { convertedDate },
+      withCredentials: true,
     }).then(res => setDailyRecordData(res.data));
   };
 
