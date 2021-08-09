@@ -40,6 +40,7 @@ const Main = () => {
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyData, setStoryData] = useState();
   const [isSettingsOpen, setIsSettingsOpen] = useState();
+  const [dDay, setDDay] = useState();
 
   useEffect(() => {
     const year = calendarDate.getFullYear();
@@ -53,16 +54,21 @@ const Main = () => {
       url: 'http://localhost:3000/data/main/record.json',
       method: 'get',
     }).then(res => {
-      console.log(res.data.data[0]);
       if (res.data.data[0].post) {
         setDailyRecordData(res.data.data[0].post);
         calculateTotalCost(res.data.data[0].post);
       } else {
         setDailyRecordData('');
       }
+
+      const coupleDate = new Date(res.data.data[0].user.dday);
+      const calcDate = today.getTime() - coupleDate.getTime();
+
+      setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
       setCoupleData(res.data.data[0].user);
       setIsLoading(false);
     });
+    const today = new Date();
   }, [calendarDate]);
 
   const showRecord = async () => {
@@ -90,11 +96,12 @@ const Main = () => {
       : setData(value);
   };
 
-  const getDDay = () => {
-    const year = calendarDate.getFullYear();
-    const month = `0${calendarDate.getMonth() + 1}`.slice(-2);
-    const date = `0${calendarDate.getDate()}`.slice(-2);
-    setConvertedDate(`${year}-${month}-${date}`);
+  const getDDay = data => {
+    const today = new Date();
+    const coupleDate = new Date(data.dday);
+    const calcDate = today.getTime() - coupleDate.getTime();
+
+    setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
   };
 
   const submitRecord = e => {
@@ -148,17 +155,12 @@ const Main = () => {
   const closeRecord = () => {
     setIsRecordOpen(false);
     setIsRecordEditOpen(false);
-    initializeRecord();
-  };
-
-  const initializeRecord = () => {
     setTime();
     setCostCategory();
     setCostContent();
     setCost();
     setPicture();
     setStory();
-    setRecordId();
     setRecordId();
     setNotice(false);
   };
@@ -289,7 +291,7 @@ const Main = () => {
               <NoNickName> 등록해 주세요</NoNickName>
             )}
           </NickNameWrap>
-          <DDay>{coupleData && coupleData.dday ? 'D + 100일' : ''}</DDay>
+          <DDay>{coupleData && coupleData.dday ? `D + ${dDay}일` : ''}</DDay>
           <RecordCalendar>
             <Calendar
               value={calendarDate}
