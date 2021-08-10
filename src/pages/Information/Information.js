@@ -94,7 +94,7 @@ const Information = () => {
     userData.append('invitee_nickname', invitedNickName);
 
     axios({
-      url: `http://${API}/user/register-info`,
+      url: `http://${API}/user/${isEdit ? 'edit' : 'register-info'}`,
       method: 'post',
       headers: { _id: location.search.slice(6) },
       data: userData,

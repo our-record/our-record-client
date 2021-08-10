@@ -1,57 +1,168 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
 import {
   tableSet,
   tableHeadSet,
   tableDataSet,
-  bottomTableDataSet,
   flexSet,
-  textInputSet,
-  dateInputSet,
 } from '../../styles/mixin';
+import { API } from '../../config';
 
 const Anniversary = () => {
+  const [minimumDate, setMinimumDate] = useState();
+  const [coupleInfo, setCoupleInfo] = useState();
+  const [DefaultEventTable, setDefaultEventTable] = useState();
+  const [invitorBirth, setInvitorBirth] = useState();
+  const [inviteeBirth, setInviteeBirth] = useState();
+  const [dDay, setDDay] = useState();
+  const [dDayCount, setDDayCount] = useState();
+  const [eventData, setEventData] = useState();
+  const [anniversary, setAnniversary] = useState('');
+  const [date, setDate] = useState('');
+
+  useEffect(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = `0${today.getMonth() + 1}`.slice(-2);
+    const date = `0${today.getDate()}`.slice(-2);
+    setMinimumDate(`${year}-${month}-${date}`);
+
+    axios({
+      url: `http://localhost:3000/data/information/information.json`,
+      method: 'get',
+    }).then(res => {
+      setCoupleInfo(res.data);
+      calcDefaultEvent(res.data);
+    });
+
+    axios({
+      url: `http://localhost:3000/data/anniversary/anniversary.json`,
+      method: 'get',
+    }).then(res => {
+      setEventData(res.data);
+    });
+  }, []);
+
+  const calcDefaultEvent = data => {
+    data.invitor_birth && getEventTable(data.invitor_birth, setInvitorBirth);
+    data.invitee_birth && getEventTable(data.invitee_birth, setInviteeBirth);
+    data.dday && getEventTable(data.dday, setDDay);
+    data.dday && getEventTable(data.dday, setDDayCount);
+  };
+
+  const getEventTable = (event, func) => {
+    const today = new Date();
+    const eventDate = new Date(event);
+    const age = today.getFullYear() - eventDate.getFullYear();
+    const calcAge =
+      Math.floor(today.getTime() - eventDate.getTime()) /
+      (1000 * 60 * 60 * 24 * 365);
+
+    const year = today.getFullYear();
+    const month = `0${eventDate.getMonth() + 1}`.slice(-2);
+    const date = `0${eventDate.getDate()}`.slice(-2);
+
+    func === setDDayCount
+      ? func(Math.floor(calcAge + 1))
+      : func(`${calcAge < age ? year : year + 1}-${month}-${date}`);
+  };
+
+  const deleteEvent = () => {};
+
+  const submitEvent = () => {
+    const validation = anniversary && date;
+
+    if (!validation) {
+      return;
+    }
+
+    if (window.confirm('기념일을 등록하시겠습니까?')) {
+      axios({
+        url: `http://${API}/anniversary/write`,
+        method: 'post',
+        data: { eventName: anniversary, date: date },
+      }).then(setAnniversary(''), setDate(''));
+    }
+  };
+
   return (
     <AnniversaryWrap>
       <ContentsWrap>
-        <MainTitle>기념일을 등록해 주세요</MainTitle>
+        <MainTitle>기억하고 싶은 기념일을 등록해 주세요</MainTitle>
         <SubCopy>등록한 기념일은 3일전부터 홈 화면에 알려 드립니다 :)</SubCopy>
         <AnniversaryTable>
-          <colgroup>
-            <col style={{ width: '40%' }} />
-            <col style={{ width: '40%' }} />
-            <col style={{ width: '20%' }} />
-          </colgroup>
           <tr>
-            <TableHead>기념일</TableHead>
-            <TableHead>날짜</TableHead>
-            <TableHead>삭제/수정</TableHead>
+            <TableHead style={{ width: '40%' }}>기념일</TableHead>
+            <TableHead style={{ width: '40%' }}>날짜</TableHead>
+            <TableHead style={{ width: '20%' }}>삭제/수정</TableHead>
           </tr>
+          {invitorBirth && (
+            <tr>
+              <DefaultEvent>
+                {coupleInfo.invitor_nickname
+                  ? coupleInfo.invitor_nickname
+                  : '사용자1'}{' '}
+                생일
+              </DefaultEvent>
+              <DefaultEvent>{invitorBirth}</DefaultEvent>
+              <DefaultEvent></DefaultEvent>
+            </tr>
+          )}
+          {inviteeBirth && (
+            <tr>
+              <DefaultEvent>
+                {coupleInfo.invitee_nickname
+                  ? coupleInfo.invitee_nickname
+                  : '사용자2'}{' '}
+                생일
+              </DefaultEvent>
+              <DefaultEvent>{inviteeBirth}</DefaultEvent>
+              <DefaultEvent></DefaultEvent>
+            </tr>
+          )}
+          {dDay && (
+            <tr>
+              <DefaultEvent>{dDayCount}주년</DefaultEvent>
+              <DefaultEvent>{dDay}</DefaultEvent>
+              <DefaultEvent></DefaultEvent>
+            </tr>
+          )}
+          {eventData &&
+            eventData.map(data => {
+              return (
+                <TableRow key={data.id}>
+                  <TableData>{data.eventName}</TableData>
+                  <TableData>{data.date.slice(0, 10)}</TableData>
+                  <TableData>
+                    {' '}
+                    <DeleteImage alt="delete" src="/icon/delete.png" />
+                    <EditImage alt="edit" src="/icon/edit.png" />
+                  </TableData>
+                </TableRow>
+              );
+            })}
           <tr>
-            <TableData>콧저씨생일</TableData>
-            <TableData>2021-01-28</TableData>
+            <TableData>
+              <AnniversaryInput
+                type="text"
+                value={anniversary}
+                placeholder="기념일을 작성해주세요"
+                onChange={event => setAnniversary(event.target.value)}
+              />
+            </TableData>
+            <TableData>
+              <DateInput
+                type="date"
+                value={date}
+                min={minimumDate}
+                onChange={event => setDate(event.target.value)}
+              />
+            </TableData>
             <TableData>
               {' '}
-              <DeleteImage alt="delete" src="/icon/delete.png" />
-              <EditImage alt="edit" src="/icon/edit.png" />
+              <EnrollButton onClick={submitEvent}>등록</EnrollButton>
             </TableData>
-          </tr>
-          <tr>
-            <TableData>
-              <AnniversaryInput type="text" autoFocus />
-            </TableData>
-            <TableData>
-              <DateInput type="date" />
-            </TableData>
-            <TableData>
-              {' '}
-              <EnrollButton>등록</EnrollButton>
-            </TableData>
-          </tr>
-          <tr>
-            <BottomTableData colSpan="3">
-              신규 기념일 추가 <AddIcon alt="plus" src="/icon/add.png" />
-            </BottomTableData>
           </tr>
         </AnniversaryTable>
       </ContentsWrap>
@@ -75,6 +186,7 @@ const MainTitle = styled.div`
 `;
 
 const SubCopy = styled.div`
+  color: ${props => props.theme.basicGray};
   font-size: 16px;
   text-align: center;
 `;
@@ -86,18 +198,23 @@ const TableHead = styled.th`
   ${tableHeadSet};
 `;
 
+const TableRow = styled.tr`
+  &:hover {
+    background-color: rgb(220, 220, 220);
+  }
+`;
+
+const DefaultEvent = styled.td`
+  ${tableDataSet};
+  border: none;
+  background-color: #fff7f2;
+`;
+
 const TableData = styled.td`
   ${tableDataSet};
-`;
-
-const BottomTableData = styled.td`
-  ${bottomTableDataSet}
-  cursor: pointer;
-`;
-
-const AddIcon = styled.img`
-  width: 10px;
-  opacity: 0.7;
+  border-right: none;
+  border-left: none;
+  border-bottom: none;
 `;
 
 const DeleteImage = styled.img`
@@ -114,14 +231,49 @@ const EditImage = styled.img`
 `;
 
 const AnniversaryInput = styled.input`
-  ${textInputSet}
+  height: 18px;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicDarkGray};
+  font-size: 12px;
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::placeholder {
+    color: ${props => props.theme.basicGray};
+    vertical-align: middle;
+    font-size: 12px;
+  }
 `;
 
 const DateInput = styled.input`
-  ${dateInputSet}
+  width: 120px;
+  height: 18px;
+  appearance: none;
+  border: ${props => props.theme.basicBorder};
+  color: ${props => props.theme.basicGray};
+  font-size: 12px;
+
+  &:focus {
+    border: 1px solid ${props => props.theme.keyColor};
+    outline: none;
+  }
+
+  ::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+  }
 `;
 
-const EnrollButton = styled.span`
+const EnrollButton = styled.button`
+  padding: 1px 12px;
+  border: 1px solid rgb(220, 220, 220);
+  border-radius: 3px;
+  color: ${props => props.theme.basicDarkGray};
+  background-color: white;
+  font-size: 10px;
+  box-shadow: 1px 1px rgb(200, 200, 200);
   cursor: pointer;
 `;
 

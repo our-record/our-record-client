@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { flexSet } from '../../../styles/mixin';
 import { API } from '../../../config';
 
-const Settings = ({ isOpen, setOpen }) => {
+const Settings = ({ isOpen, setOpen, today }) => {
   const history = useHistory();
   const settingsElement = useRef();
 
@@ -61,6 +61,7 @@ const MenuWrap = styled.div`
 
   &:last-child {
     margin-top: 7px;
+    margin-bottom: 0px;
   }
 
   &:hover > div {

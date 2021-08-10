@@ -85,12 +85,12 @@ const Main = () => {
         setDailyRecordData('');
       }
 
-      const coupleDate = new Date(res.data.data[0].user.dday);
+      const coupleDate = new Date(res.data.data[0]);
       const today = new Date();
       const calcDate = today.getTime() - coupleDate.getTime();
       setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
 
-      setCoupleData(res.data.data[0].user);
+      setCoupleData(res.data.data[0]);
       setIsLoading(false);
     });
   };
@@ -269,7 +269,11 @@ const Main = () => {
               onClick={() => setIsSettingsOpen(true)}
             />
             {isSettingsOpen && (
-              <Settings isOpen={isSettingsOpen} setOpen={setIsSettingsOpen} />
+              <Settings
+                isOpen={isSettingsOpen}
+                setOpen={setIsSettingsOpen}
+                today={convertedDate}
+              />
             )}
           </div>
         </RightWrap>
