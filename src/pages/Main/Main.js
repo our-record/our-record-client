@@ -85,14 +85,14 @@ const Main = () => {
         setDailyRecordData('');
       }
 
-      const coupleDate = new Date(res.data.data[0]);
+      const coupleDate = new Date(res.data[1].dday);
       const today = new Date();
       const calcDate = today.getTime() - coupleDate.getTime();
       setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
 
-      setCoupleData(res.data.data[0]);
-      setIsLoading(false);
+      setCoupleData(res.data[1]);
     });
+    setIsLoading(false);
   };
 
   const handleData = (event, setData, isCost) => {
@@ -100,14 +100,6 @@ const Main = () => {
     isCost
       ? setData(value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '1'))
       : setData(value);
-  };
-
-  const getDDay = data => {
-    const today = new Date();
-    const coupleDate = new Date(data.dday);
-    const calcDate = today.getTime() - coupleDate.getTime();
-
-    setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
   };
 
   const submitRecord = e => {
@@ -146,7 +138,7 @@ const Main = () => {
       data: recordData,
       withCredentials: true,
     }).then(res => {
-      alert('정보 입력이 완료되었습니다');
+      alert(`정보 ${recordId ? '수정' : '입력'}이 완료되었습니다`);
       getRecord();
       closeRecord();
     });
@@ -172,8 +164,12 @@ const Main = () => {
   };
 
   const calculateTotalCost = data => {
-    const sumResult = data.reduce((pre, crr) => pre + crr.expense, 0);
-    setTotalCost(sumResult);
+    if (data.length === 1) {
+      setTotalCost(data.expense);
+    } else {
+      const sumResult = data.reduce((pre, crr) => pre + crr.expense, 0);
+      setTotalCost(sumResult);
+    }
   };
 
   const deleteRecord = (event, id) => {
@@ -211,7 +207,7 @@ const Main = () => {
     }
   };
 
-  const openStory = (event, id) => {
+  const openStory = event => {
     setStoryData(dailyRecordData.filter(data => data._id === event.target.id));
     setIsStoryOpen(true);
   };
@@ -220,7 +216,7 @@ const Main = () => {
     setIsStoryOpen(false);
   };
 
-  const editRecord = (event, id) => {
+  const editRecord = event => {
     const selectedRecord = dailyRecordData.filter(
       data => data._id === event.target.id
     )[0];
@@ -255,7 +251,9 @@ const Main = () => {
   return (
     <>
       <NavWrap>
-        <MainTitle>Our Record</MainTitle>
+        <MainTitle onClick={() => window.location.replace('/')}>
+          Our Record
+        </MainTitle>
         <RightWrap>
           <AlarmMessageWrap>
             <AlarmImage alt="alarm" src="/icon/notification-red.png" />
@@ -370,7 +368,7 @@ const Main = () => {
                               alt="story"
                               src="/icon/binoculars.png"
                               onClick={e => {
-                                openStory(e, data._id);
+                                openStory(e);
                               }}
                             />
                             <Story
@@ -399,7 +397,7 @@ const Main = () => {
                           id={data._id}
                           alt="edit"
                           src="/icon/edit.png"
-                          onClick={e => editRecord(e, data._id)}
+                          onClick={e => editRecord(e)}
                         />
                         <Record
                           isOpen={isRecordEditOpen}
@@ -472,6 +470,7 @@ const MainTitle = styled.div`
   padding-left: 35px;
   font-family: 'Anton', sans-serif;
   font-size: 22px;
+  cursor: pointer;
 `;
 
 const RightWrap = styled.div`
