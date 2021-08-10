@@ -12,7 +12,6 @@ import { API } from '../../config';
 const Anniversary = () => {
   const [minimumDate, setMinimumDate] = useState();
   const [coupleInfo, setCoupleInfo] = useState();
-  const [DefaultEventTable, setDefaultEventTable] = useState();
   const [invitorBirth, setInvitorBirth] = useState();
   const [inviteeBirth, setInviteeBirth] = useState();
   const [dDay, setDDay] = useState();
@@ -20,6 +19,8 @@ const Anniversary = () => {
   const [eventData, setEventData] = useState();
   const [anniversary, setAnniversary] = useState('');
   const [date, setDate] = useState('');
+  const [eventId, setEventId] = useState();
+  const [isEdit, setIsEdit] = useState(false);
 
   useEffect(() => {
     const today = new Date();
@@ -29,20 +30,24 @@ const Anniversary = () => {
     setMinimumDate(`${year}-${month}-${date}`);
 
     axios({
-      url: `http://localhost:3000/data/information/information.json`,
+      url: `http://${API}/register-info`,
       method: 'get',
     }).then(res => {
       setCoupleInfo(res.data);
       calcDefaultEvent(res.data);
     });
 
+    getUserEvent();
+  }, []);
+
+  const getUserEvent = () => {
     axios({
-      url: `http://localhost:3000/data/anniversary/anniversary.json`,
+      url: `http://${API}/anniversary`,
       method: 'get',
     }).then(res => {
       setEventData(res.data);
     });
-  }, []);
+  };
 
   const calcDefaultEvent = data => {
     data.invitor_birth && getEventTable(data.invitor_birth, setInvitorBirth);
@@ -68,22 +73,56 @@ const Anniversary = () => {
       : func(`${calcAge < age ? year : year + 1}-${month}-${date}`);
   };
 
-  const deleteEvent = () => {};
-
   const submitEvent = () => {
     const validation = anniversary && date;
 
     if (!validation) {
-      return;
+      alert('정보를 정확히 입력해 주세요.');
     }
 
-    if (window.confirm('기념일을 등록하시겠습니까?')) {
+    const fetchData = {};
+    isEdit && (fetchData._id = eventId);
+    fetchData.eventName = anniversary;
+    fetchData.date = date;
+
+    if (window.confirm(`기념일을 ${isEdit ? '수정' : '등록'}하시겠습니까?`)) {
       axios({
-        url: `http://${API}/anniversary/write`,
+        url: `http://${API}/anniversary/${isEdit ? 'edit' : 'write'}`,
         method: 'post',
-        data: { eventName: anniversary, date: date },
-      }).then(setAnniversary(''), setDate(''));
+        data: fetchData,
+      }).then(
+        setAnniversary(''),
+        setDate(''),
+        setEventId(''),
+        setIsEdit(false),
+        getUserEvent()
+      );
     }
+  };
+
+  const deleteEvent = event => {
+    if (window.confirm('기념일을 삭제하시겠습니까?')) {
+      axios({
+        url: `http://${API}/anniversary/remove`,
+        method: 'post',
+        data: { _id: event.target.id },
+        withCredentials: true,
+      }).then(res => {
+        alert('기록이 삭제되었습니다.');
+        getUserEvent();
+      });
+    }
+  };
+
+  const editEvent = event => {
+    console.log(event.target.id);
+    const selected = eventData.filter(
+      data => data._id === Number(event.target.id)
+    );
+    setIsEdit(true);
+    setEventId(selected[0]._id);
+    setAnniversary(selected[0].eventName);
+    setDate(selected[0].date.slice(0, 10));
   };
 
   return (
@@ -131,13 +170,23 @@ const Anniversary = () => {
           {eventData &&
             eventData.map(data => {
               return (
-                <TableRow key={data.id}>
+                <TableRow key={data._id}>
                   <TableData>{data.eventName}</TableData>
                   <TableData>{data.date.slice(0, 10)}</TableData>
                   <TableData>
                     {' '}
-                    <DeleteImage alt="delete" src="/icon/delete.png" />
-                    <EditImage alt="edit" src="/icon/edit.png" />
+                    <DeleteImage
+                      id={data._id}
+                      alt="delete"
+                      src="/icon/delete.png"
+                      onClick={e => deleteEvent(e)}
+                    />
+                    <EditImage
+                      id={data._id}
+                      alt="edit"
+                      src="/icon/edit.png"
+                      onClick={e => editEvent(e)}
+                    />
                   </TableData>
                 </TableRow>
               );
@@ -161,7 +210,9 @@ const Anniversary = () => {
             </TableData>
             <TableData>
               {' '}
-              <EnrollButton onClick={submitEvent}>등록</EnrollButton>
+              <EnrollButton onClick={submitEvent}>
+                {isEdit ? '수정' : '등록'}
+              </EnrollButton>
             </TableData>
           </tr>
         </AnniversaryTable>
