@@ -36,8 +36,8 @@ export const tableHeadSet = () => css`
 `;
 
 export const tableDataSet = () => css`
-  padding: 3px 0;
-  border: ${props => props.theme.basicBorder};
+  padding: 5px 0;
+  border: 0.5px solid rgb(220, 220, 220);
   color: ${props => props.theme.basicGray};
   text-align: center;
   vertical-align: middle;
@@ -46,6 +46,7 @@ export const tableDataSet = () => css`
 export const bottomTableDataSet = () => css`
   padding: 7px 0;
   border: ${props => props.theme.basicBorder};
+  border-top: none;
   color: ${props => props.theme.basicGray};
   text-align: center;
   vertical-align: middle;
