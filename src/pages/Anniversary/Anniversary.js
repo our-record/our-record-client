@@ -80,27 +80,27 @@ const Anniversary = () => {
 
     if (!validation) {
       alert('정보를 정확히 입력해 주세요.');
-    } else {
-      const fetchData = {};
-      isEdit && (fetchData._id = eventId);
-      fetchData.eventName = anniversary;
-      fetchData.date = date;
-
-      if (window.confirm(`기념일을 ${isEdit ? '수정' : '등록'}하시겠습니까?`)) {
-        await axios({
-          url: `http://${API}/anniversary/${isEdit ? 'edit' : 'write'}`,
-          method: 'post',
-          data: fetchData,
-          withCredentials: true,
-        }).then(
-          setAnniversary(''),
-          setDate(''),
-          setEventId(''),
-          setIsEdit(false)
-        );
-      }
-      getUserEvent();
     }
+
+    const fetchData = {};
+    isEdit && (fetchData._id = eventId);
+    fetchData.eventName = anniversary;
+    fetchData.date = date;
+
+    if (window.confirm(`기념일을 ${isEdit ? '수정' : '등록'}하시겠습니까?`)) {
+      await axios({
+        url: `http://${API}/anniversary/${isEdit ? 'edit' : 'write'}`,
+        method: 'post',
+        data: fetchData,
+        withCredentials: true,
+      }).then(
+        setAnniversary(''),
+        setDate(''),
+        setEventId(''),
+        setIsEdit(false)
+      );
+    }
+    getUserEvent();
   };
 
   const deleteEvent = event => {
@@ -118,8 +118,9 @@ const Anniversary = () => {
   };
 
   const editEvent = event => {
+    console.log(event.target.id);
     const selected = eventData.filter(data => data._id === event.target.id);
-
+    console.log(selected);
     setIsEdit(true);
     setEventId(selected[0]._id);
     setAnniversary(selected[0].eventName);

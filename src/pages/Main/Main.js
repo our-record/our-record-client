@@ -16,6 +16,7 @@ import {
   flexSet,
 } from '../../styles/mixin';
 import { API, COST_CATEGORY } from '../../config';
+import { Link } from 'react-router-dom';
 
 const Main = () => {
   const [isRecordOpen, setIsRecordOpen] = useState(false);
@@ -48,27 +49,27 @@ const Main = () => {
     const date = `0${calendarDate.getDate()}`.slice(-2);
     setConvertedDate(`${year}-${month}-${date}`);
 
-    // showRecord();
+    showRecord();
     // json파일로 작업하기 위한 코드
-    axios({
-      url: 'http://localhost:3000/data/main/record.json',
-      method: 'get',
-    }).then(res => {
-      if (res.data.data[0].post) {
-        setDailyRecordData(res.data.data[0].post);
-        calculateTotalCost(res.data.data[0].post);
-      } else {
-        setDailyRecordData('');
-      }
+    // axios({
+    //   url: 'http://localhost:3000/data/main/record.json',
+    //   method: 'get',
+    // }).then(res => {
+    //   if (res.data.data[0].post) {
+    //     setDailyRecordData(res.data.data[0].post);
+    //     calculateTotalCost(res.data.data[0].post);
+    //   } else {
+    //     setDailyRecordData('');
+    //   }
 
-      const coupleDate = new Date(res.data.data[0].user.dday);
-      const today = new Date();
-      const calcDate = today.getTime() - coupleDate.getTime();
-      setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
+    //   const coupleDate = new Date(res.data.data[0].user.dday);
+    //   const today = new Date();
+    //   const calcDate = today.getTime() - coupleDate.getTime();
+    //   setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
 
-      setCoupleData(res.data.data[0].user);
-      setIsLoading(false);
-    });
+    //   setCoupleData(res.data.data[0].user);
+    //   setIsLoading(false);
+    // });
   }, [calendarDate, convertedDate]);
 
   const showRecord = async () => {
@@ -78,6 +79,7 @@ const Main = () => {
       data: { convertedDate },
       withCredentials: true,
     }).then(res => {
+      console.log(res.data);
       if (res.data[0]) {
         setDailyRecordData(res.data[0]);
         calculateTotalCost(res.data[0]);
@@ -331,7 +333,9 @@ const Main = () => {
             placeName={placeName}
             convertedDate={convertedDate}
           />
-          <StatisticsButton>이 달의 통계</StatisticsButton>
+          <Link to="/chart">
+            <StatisticsButton>이 달의 통계</StatisticsButton>
+          </Link>
         </SideWrap>
         <ContentsWrap>
           <MapWrap>
