@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import axios from 'axios';
 import styled from 'styled-components';
 import { flexSet } from '../../../styles/mixin';
 import { API } from '../../../config';
 
-const Settings = ({ isOpen, setOpen, today }) => {
+const Settings = ({ isOpen, setOpen }) => {
   const history = useHistory();
   const settingsElement = useRef();
 
@@ -26,10 +25,6 @@ const Settings = ({ isOpen, setOpen, today }) => {
         <IconImage alt="information" src="/icon/information.png" />
         <ButtonText>정보 변경</ButtonText>
       </MenuWrap>
-      <MenuWrap onClick={() => history.push('/anniversary')}>
-        <IconImage alt="information" src="/icon/anniversary.png" />
-        <ButtonText>기념일 설정</ButtonText>
-      </MenuWrap>
       <LinkEl href={`http://${API}/user/logout`}>
         <MenuWrap>
           <IconImage alt="information" src="/icon/logout.png" />
@@ -45,7 +40,7 @@ const SettingsWrap = styled.div`
   top: 4.7vh;
   right: 35px;
   width: 120px;
-  padding: 7px 10px;
+  padding: 0 10px 7px 10px;
   border: ${props => props.theme.basicBorder};
   background-color: white;
   box-shadow: 1px 1px rgb(200, 200, 200);
@@ -53,16 +48,8 @@ const SettingsWrap = styled.div`
 
 const MenuWrap = styled.div`
   ${flexSet('row', 'flex-start', 'center')}
+  padding-top: 7px;
   cursor: pointer;
-
-  &:first-child {
-    margin-bottom: 7px;
-  }
-
-  &:last-child {
-    margin-top: 7px;
-    margin-bottom: 0px;
-  }
 
   &:hover > div {
     color: ${props => props.theme.basicDarkGray};
