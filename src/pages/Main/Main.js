@@ -3,7 +3,7 @@ import axios from 'axios';
 import Record from '../../components/Record/Record';
 import Story from '../../components/Story/Story';
 import SearchPlace from '../../components/Main/Map/SearchPlace';
-import Settings from '../../components/Main/Settings/Settings';
+import Nav from '../../components/Nav/Nav';
 import Calendar from 'react-calendar';
 import styled from 'styled-components';
 import 'react-calendar/dist/Calendar.css';
@@ -27,12 +27,12 @@ const Main = () => {
   const [costContent, setCostContent] = useState();
   const [cost, setCost] = useState();
   const [picture, setPicture] = useState();
-  const [story, setStory] = useState();
+  const [story, setStory] = useState('');
   const [totalCost, setTotalCost] = useState(0);
   const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [convertedDate, setConvertedDate] = useState(new Date());
-  const [placeName, setPlaceName] = useState();
+  const [placeName, setPlaceName] = useState('');
   const [long, setLong] = useState();
   const [lat, setLat] = useState();
   const [dailyRecordData, setDailyRecordData] = useState();
@@ -40,7 +40,6 @@ const Main = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyData, setStoryData] = useState();
-  const [isSettingsOpen, setIsSettingsOpen] = useState();
   const [dDay, setDDay] = useState();
 
   useEffect(() => {
@@ -51,25 +50,29 @@ const Main = () => {
 
     showRecord();
     // json파일로 작업하기 위한 코드
-    // axios({
-    //   url: 'http://localhost:3000/data/main/record.json',
-    //   method: 'get',
-    // }).then(res => {
-    //   if (res.data.data[0].post) {
-    //     setDailyRecordData(res.data.data[0].post);
-    //     calculateTotalCost(res.data.data[0].post);
-    //   } else {
-    //     setDailyRecordData('');
-    //   }
+    const showRecordjson = async () => {
+      await axios({
+        url: 'http://localhost:3000/data/main/record.json',
+        method: 'get',
+      }).then(res => {
+        if (res.data.data[0].post) {
+          setDailyRecordData(res.data.data[0].post);
+          calculateTotalCost(res.data.data[0].post);
+        } else {
+          setDailyRecordData('');
+        }
+        const coupleDate = new Date(res.data.data[0].user.dday);
+        const today = new Date();
+        const calcDate = today.getTime() - coupleDate.getTime();
+        setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
 
-    //   const coupleDate = new Date(res.data.data[0].user.dday);
-    //   const today = new Date();
-    //   const calcDate = today.getTime() - coupleDate.getTime();
-    //   setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
+        setCoupleData(res.data.data[0].user);
+      });
 
-    //   setCoupleData(res.data.data[0].user);
-    //   setIsLoading(false);
-    // });
+      setIsLoading(false);
+    };
+    showRecordjson();
+    // json 파일 작업 코드 끝!
   }, [calendarDate, convertedDate]);
 
   const showRecord = async () => {
@@ -135,7 +138,7 @@ const Main = () => {
     recordData.append('story', story);
 
     axios({
-      url: `http://${API}/post/${recordId ? `edit` : `write`}`,
+      url: `http://${API}/post/${recordId ? 'edit' : 'write'}`,
       method: 'post',
       data: recordData,
       withCredentials: true,
@@ -147,7 +150,11 @@ const Main = () => {
   };
 
   const cancleRecord = () => {
-    if (window.confirm('작성을 취소하시겠습니까?')) {
+    if (
+      window.confirm(
+        `${isRecordEditOpen ? '수정' : '작성'}을 취소하시겠습니까?`
+      )
+    ) {
       closeRecord();
     }
   };
@@ -228,8 +235,8 @@ const Main = () => {
     setCostCategory(COST_CATEGORY[selectedRecord.category]);
     setCostContent(selectedRecord.expenseInfo);
     setCost(selectedRecord.expense);
-    setStory(selectedRecord.story);
-    setPlaceName(selectedRecord.place);
+    selectedRecord.story && setStory(selectedRecord.story);
+    selectedRecord.place && setPlaceName(selectedRecord.place);
     setIsRecordEditOpen(true);
   };
 
@@ -251,33 +258,8 @@ const Main = () => {
   }
 
   return (
-    <>
-      <NavWrap>
-        <MainTitle onClick={() => window.location.replace('/')}>
-          Our Record
-        </MainTitle>
-        <RightWrap>
-          <AlarmMessageWrap>
-            <AlarmImage alt="alarm" src="/icon/notification-red.png" />
-            <AlarmText>가까운 기념일이 없습니다</AlarmText>
-          </AlarmMessageWrap>
-          <div>
-            <HomeButton alt="home button" src="/icon/home-black.png" />
-            <SettingButton
-              alt="settings button"
-              src="/icon/settings.png"
-              onClick={() => setIsSettingsOpen(true)}
-            />
-            {isSettingsOpen && (
-              <Settings
-                isOpen={isSettingsOpen}
-                setOpen={setIsSettingsOpen}
-                today={convertedDate}
-              />
-            )}
-          </div>
-        </RightWrap>
-      </NavWrap>
+    <MainWrap>
+      <Nav />
       <BodyWrap>
         <SideWrap>
           <ProfileImage
@@ -454,60 +436,17 @@ const Main = () => {
           )}
         </ContentsWrap>
       </BodyWrap>
-    </>
+    </MainWrap>
   );
 };
 
-const NavWrap = styled.div`
-  ${flexSet('row', 'space-between', 'center')}
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 5vh;
-  padding: 10px 0;
-  border-bottom: ${props => props.theme.basicBorder};
-  background-color: white;
-  z-index: 100;
-`;
+const MainWrap = styled.div`
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 
-const MainTitle = styled.div`
-  padding-left: 35px;
-  font-family: 'Anton', sans-serif;
-  font-size: 22px;
-  cursor: pointer;
-`;
-
-const RightWrap = styled.div`
-  ${flexSet('row', 'space-between', 'center')}
-  padding-right: 35px;
-`;
-
-const AlarmMessageWrap = styled.div`
-  ${flexSet('row', 'space-between', 'center')}
-  margin-right: 50px;
-`;
-
-const AlarmImage = styled.img`
-  width: 20px;
-  margin-right: 10px;
-`;
-
-const AlarmText = styled.div`
-  width: 200px;
-  color: ${props => props.theme.basicDarkGray};
-  font-size: 14px;
-  text-decoration: underline;
-`;
-
-const HomeButton = styled.img`
-  width: 29px;
-  padding-right: 10px;
-  cursor: pointer;
-`;
-
-const SettingButton = styled.img`
-  width: 20px;
-  cursor: pointer;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const BodyWrap = styled.div`
@@ -601,6 +540,7 @@ const ListTitle = styled.div`
 
 const ListTable = styled.table`
   ${tableSet('100%')}
+  font-size: 0.7rem;
 `;
 
 const TableHead = styled.th`

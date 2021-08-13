@@ -27,6 +27,7 @@ const Routes = () => (
           <Route exact path="/test" component={TestForm} />
           <Route exact path="/information_edit" component={Information} />
           <Route exact path="/chart" component={Chart} />
+          <Route exact path="/*" component={Main} />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>
