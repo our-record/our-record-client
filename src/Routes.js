@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import Main from './pages/Main/Main';
 import Register from './pages/Register/Register';
@@ -18,16 +18,16 @@ const Routes = () => (
       <GlobalStyle />
       <BrowserRouter>
         <Switch>
-          <Route exact path="/" component={Main} />
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/information" component={Information} />
-          <Route exact path="/anniversary" component={Anniversary} />
-          <Route exact path="/record" component={Record} />
-          <Route exact path="/story" component={Story} />
-          <Route exact path="/test" component={TestForm} />
-          <Route exact path="/information_edit" component={Information} />
-          <Route exact path="/chart" component={Chart} />
-          <Route exact path="/*" component={Main} />
+          <Route path="/" exact component={Main} />
+          <Route path="/register" exact component={Register} />
+          <Route path="/information" exact component={Information} />
+          <Route path="/anniversary" exact component={Anniversary} />
+          <Route path="/record" exact component={Record} />
+          <Route path="/story" exact component={Story} />
+          <Route path="/test" exact component={TestForm} />
+          <Route path="/information_edit" exact component={Information} />
+          <Route path="/chart" exact component={Chart} />
+          <Redirect path="/*" component={Register} />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>
