@@ -15,14 +15,6 @@ const Register = () => {
             src="/images/register/kakao_login.png"
           />
         </a>
-        <GoogleButton
-          alt="kakao login"
-          src="/images/register/kakao_login.png"
-        />
-        <FacebookButton
-          alt="kakao login"
-          src="/images/register/kakao_login.png"
-        />
       </LoginWrap>
     </RegisterWrap>
   );
@@ -35,7 +27,7 @@ const RegisterWrap = styled.div`
 
 const LoginWrap = styled.div`
   width: 340px;
-  height: 340px;
+  height: 260px;
   padding: 40px 20px;
   border: 2px solid rgb(100, 100, 100);
   text-align: center;
@@ -54,13 +46,6 @@ const SubTitle = styled.div`
 
 const KakaoButton = styled.img`
   margin-bottom: 10px;
-  cursor: pointer;
-`;
-const GoogleButton = styled.img`
-  margin-bottom: 10px;
-  cursor: pointer;
-`;
-const FacebookButton = styled.img`
   cursor: pointer;
 `;
 

@@ -3,13 +3,7 @@ import MapContainer from './MapContainer';
 import styled from 'styled-components';
 import { textInputSet, buttonSet } from '../../../styles/mixin';
 
-const SearchPlace = ({
-  setPlaceName,
-  setLong,
-  setLat,
-  convertedDate,
-  recordMarkers,
-}) => {
+const SearchPlace = ({ setPlaceName, setLong, setLat, recordMarkers }) => {
   const [inputText, setInputText] = useState('');
   const [place, setPlace] = useState('');
 
@@ -41,7 +35,6 @@ const SearchPlace = ({
         setPlaceName={setPlaceName}
         setLong={setLong}
         setLat={setLat}
-        convertedDate={convertedDate}
         recordMarkers={recordMarkers}
       />
     </>

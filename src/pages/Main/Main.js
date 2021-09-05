@@ -16,6 +16,13 @@ import {
   flexSet,
 } from '../../styles/mixin';
 import { API, COST_CATEGORY } from '../../config';
+import {
+  getMainData,
+  postRecord,
+  removeRecord,
+  removeAllRecord,
+  getDailyRecord,
+} from '../../api';
 import { Link } from 'react-router-dom';
 
 const Main = () => {
@@ -35,7 +42,7 @@ const Main = () => {
   const [placeName, setPlaceName] = useState('');
   const [long, setLong] = useState();
   const [lat, setLat] = useState();
-  const [dailyRecordData, setDailyRecordData] = useState();
+  const [dailyRecordData, setDailyRecordData] = useState([]);
   const [coupleData, setCoupleData] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
@@ -48,56 +55,29 @@ const Main = () => {
     const date = `0${calendarDate.getDate()}`.slice(-2);
     setConvertedDate(`${year}-${month}-${date}`);
 
-    showRecord();
-    // json파일로 작업하기 위한 코드
-    const showRecordjson = async () => {
-      await axios({
-        url: 'http://localhost:3000/data/main/record.json',
-        method: 'get',
-      }).then(res => {
-        if (res.data.data[0].post) {
-          setDailyRecordData(res.data.data[0].post);
-          calculateTotalCost(res.data.data[0].post);
-        } else {
-          setDailyRecordData('');
-        }
-        const coupleDate = new Date(res.data.data[0].user.dday);
-        const today = new Date();
-        const calcDate = today.getTime() - coupleDate.getTime();
-        setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
-
-        setCoupleData(res.data.data[0].user);
-      });
-
-      setIsLoading(false);
-    };
-    showRecordjson();
-    // json 파일 작업 코드 끝!
+    showRecord(convertedDate);
   }, [calendarDate, convertedDate]);
 
-  const showRecord = async () => {
-    await axios({
-      url: `http://${API}/`,
-      method: 'post',
-      data: { convertedDate },
-      withCredentials: true,
-    }).then(res => {
-      console.log(res.data);
-      if (res.data[0]) {
-        setDailyRecordData(res.data[0]);
-        calculateTotalCost(res.data[0]);
-      } else {
-        setDailyRecordData('');
-      }
+  useEffect(() => {
+    calculateTotalCost(dailyRecordData);
+  }, [dailyRecordData]);
 
-      const coupleDate = new Date(res.data[1].dday);
+  const showRecord = async convertedDate => {
+    try {
+      const { data } = await getMainData(convertedDate);
+
+      const coupleDate = new Date(data[1].dday);
       const today = new Date();
       const calcDate = today.getTime() - coupleDate.getTime();
-      setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
 
-      setCoupleData(res.data[1]);
-    });
-    setIsLoading(false);
+      setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
+      setCoupleData(data[1]);
+      data[0] && setDailyRecordData(data[0]);
+    } catch (e) {
+      console.log(`error: ${e}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleData = (event, setData, isCost) => {
@@ -113,11 +93,12 @@ const Main = () => {
     const conditions = time && costContent && cost && costCategory;
 
     conditions
-      ? window.confirm('기록을 등록하시겠습니까?') && enrollRecord()
+      ? window.confirm(`기록을 ${recordId ? '수정' : '입력'} 하시겠습니까?`) &&
+        enrollRecord()
       : setNotice(true);
   };
 
-  const enrollRecord = () => {
+  const enrollRecord = async () => {
     const recordData = new FormData();
 
     if (recordId) {
@@ -142,11 +123,13 @@ const Main = () => {
       method: 'post',
       data: recordData,
       withCredentials: true,
-    }).then(res => {
-      alert(`정보 ${recordId ? '수정' : '입력'}이 완료되었습니다`);
-      getRecord();
-      closeRecord();
-    });
+    })
+      .then(res => {
+        alert(`정보 ${recordId ? '수정' : '입력'}이 완료되었습니다`);
+        getRecord();
+        closeRecord();
+      })
+      .catch(error => console.log(error));
   };
 
   const cancleRecord = () => {
@@ -162,6 +145,7 @@ const Main = () => {
   const closeRecord = () => {
     setIsRecordOpen(false);
     setIsRecordEditOpen(false);
+    setPlaceName('');
     setTime();
     setCostCategory();
     setCostContent();
@@ -174,46 +158,30 @@ const Main = () => {
 
   const calculateTotalCost = data => {
     if (data.length === 1) {
-      setTotalCost(data.expense);
+      setTotalCost(data[0].expense);
     } else {
       const sumResult = data.reduce((pre, crr) => pre + crr.expense, 0);
       setTotalCost(sumResult);
     }
   };
 
-  const deleteRecord = (event, id) => {
+  const deleteRecord = id => {
     if (window.confirm('기록을 삭제하시겠습니까?')) {
-      const filtered = dailyRecordData.filter(
-        data => data._id !== event.target.id
-      );
-
-      setDailyRecordData(filtered);
-      calculateTotalCost(filtered);
-
-      axios({
-        url: `http://${API}/post/remove`,
-        method: 'post',
-        data: { convertedDate, id },
-        withCredentials: true,
-      }).then(res => {
-        alert('기록이 삭제되었습니다.');
-      });
+      removeRecord(convertedDate, id);
+      getRecord();
     }
   };
 
   const deleteAllRecord = () => {
     if (window.confirm('기록 전체를 삭제하시겠습니까?')) {
-      setDailyRecordData('');
-
-      axios({
-        url: `http://${API}/post/remove-all`,
-        method: 'post',
-        data: { convertedDate },
-        withCredentials: true,
-      }).then(res => {
-        alert('기록이 삭제되었습니다.');
-      });
+      removeAllRecord(convertedDate);
+      setDailyRecordData([]);
     }
+  };
+
+  const getRecord = async () => {
+    const { data } = await getDailyRecord(convertedDate);
+    setDailyRecordData(data);
   };
 
   const openStory = event => {
@@ -232,21 +200,12 @@ const Main = () => {
 
     setRecordId(selectedRecord._id);
     setTime(selectedRecord.time);
-    setCostCategory(COST_CATEGORY[selectedRecord.category]);
+    setCostCategory(selectedRecord.category);
     setCostContent(selectedRecord.expenseInfo);
     setCost(selectedRecord.expense);
     selectedRecord.story && setStory(selectedRecord.story);
     selectedRecord.place && setPlaceName(selectedRecord.place);
     setIsRecordEditOpen(true);
-  };
-
-  const getRecord = () => {
-    axios({
-      url: `http://${API}/post/list`,
-      method: 'post',
-      data: { convertedDate },
-      withCredentials: true,
-    }).then(res => setDailyRecordData(res.data));
   };
 
   if (isLoading) {
@@ -325,8 +284,6 @@ const Main = () => {
               setPlaceName={setPlaceName}
               setLong={setLong}
               setLat={setLat}
-              calendarDate={calendarDate}
-              convertedDate={convertedDate}
               recordMarkers={dailyRecordData}
             />
           </MapWrap>
@@ -369,7 +326,7 @@ const Main = () => {
                       </TableData>
                       <TableData>{data.time}</TableData>
                       <TableData>{data.place ? data.place : `-`}</TableData>
-                      <TableData>{data.category}</TableData>
+                      <TableData>{COST_CATEGORY[data.category]}</TableData>
                       <TableData>{data.expenseInfo}</TableData>
                       <TableData>{data.expense.toLocaleString()}원</TableData>
                       <TableData>
@@ -377,7 +334,7 @@ const Main = () => {
                           id={data._id}
                           alt="delete"
                           src="/icon/delete.png"
-                          onClick={e => deleteRecord(e, data._id)}
+                          onClick={() => deleteRecord(data._id)}
                         />
                         <EditButton
                           id={data._id}
@@ -414,7 +371,7 @@ const Main = () => {
                 <tr>
                   <BottomTableData colSpan="5">합계</BottomTableData>
                   <BottomTableData>
-                    {totalCost.toLocaleString()}원
+                    {Number(totalCost).toLocaleString()}원
                   </BottomTableData>
                   <BottomTableData
                     className="allDeleteButton"
