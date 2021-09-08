@@ -1,17 +1,13 @@
 import axios from 'axios';
 
+export const API = 'localhost:4000';
+
 const api = axios.create({
-  baseURL: 'http://localhost:4000',
+  baseURL: `http://localhost:4000`,
   withCredentials: true,
 });
 
 export const getMainData = convertedDate => api.post('/', { convertedDate });
-
-export const postRecord = recordData =>
-  api.post(`/post/write`, {
-    data: recordData,
-    headers: { 'Content-type': 'application/x-www-form-urlencoded' },
-  });
 
 export const removeRecord = (convertedDate, id) =>
   api.post('/post/remove', { convertedDate, id });
