@@ -3,18 +3,23 @@ import MapContainer from './MapContainer';
 import styled from 'styled-components';
 import { textInputSet, buttonSet } from '../../../styles/mixin';
 
-const SearchPlace = ({ setPlaceName, setLong, setLat, recordMarkers }) => {
+const SearchPlaceInput = ({
+  searchTerm,
+  setSearchTerm,
+  setPlaceName,
+  setLong,
+  setLat,
+  recordMarkers,
+}) => {
   const [inputText, setInputText] = useState('');
-  const [place, setPlace] = useState('');
 
   const handleInput = event => {
-    const { value } = event.target;
-    setInputText(value);
+    setInputText(event.target.value);
   };
 
   const handleSubmit = e => {
     e.preventDefault();
-    setPlace(inputText);
+    setSearchTerm(inputText);
     setInputText('');
   };
 
@@ -31,7 +36,7 @@ const SearchPlace = ({ setPlaceName, setLong, setLat, recordMarkers }) => {
         <SearchButton type="submit">검색</SearchButton>
       </form>
       <MapContainer
-        searchPlace={place}
+        searchTerm={searchTerm}
         setPlaceName={setPlaceName}
         setLong={setLong}
         setLat={setLat}
@@ -58,4 +63,4 @@ const SearchButton = styled.button`
   ${buttonSet}
 `;
 
-export default SearchPlace;
+export default SearchPlaceInput;
