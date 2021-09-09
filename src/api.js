@@ -17,3 +17,15 @@ export const removeAllRecord = convertedDate =>
 
 export const getDailyRecord = convertedDate =>
   api.post('/post/list', { convertedDate });
+
+export const removeEvent = target => {
+  api.post('/anniversary/remove', { _id: target });
+};
+
+export const postEvent = eventData => {
+  api.post('/anniversary/write', eventData);
+};
+
+export const editEvent = eventData => {
+  api.post('/anniversary/edit', eventData);
+};
