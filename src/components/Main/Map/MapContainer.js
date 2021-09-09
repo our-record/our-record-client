@@ -89,11 +89,11 @@ const MapContainer = ({
 
       if (status === kakao.maps.services.Status.OK) {
         let bounds = new kakao.maps.LatLngBounds();
-        setSearchData(data);
         for (let i = 0; i < data.length; i++) {
           displayMarker(data[i], markerImage);
           bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
         }
+        setSearchData(data);
         map.setBounds(bounds);
       }
     };
@@ -147,14 +147,14 @@ const MapContainer = ({
 
       kakao.maps.event.addListener(marker, 'click', function () {
         window.event.preventDefault();
+        markClickedPlace(searchData, place);
         setPlaceName(place.place_name);
         setLong(place.x);
         setLat(place.y);
-        markClickedPlace(searchData, place);
       });
     };
 
-    const markClickedPlace = (allData, clickedPlace) => {
+    const markClickedPlace = (searchData, clickedPlace) => {
       const ClickedImageSrc = '/icon/pin.png';
       const ImageSrc = '/icon/placeholder.png';
       const imageSize = new kakao.maps.Size(38, 38);
@@ -172,13 +172,14 @@ const MapContainer = ({
         imageOption
       );
 
-      if (allData) {
-        for (let i = 0; i < allData.length; i++) {
-          displayMarker(allData[i], markerImage);
+      const markAllSearch = () => {
+        for (let i = 0; i < searchData.length; i++) {
+          displayMarker(searchData[i], markerImage);
         }
-      }
+        displayMarker(clickedPlace, ClickedMarkerImage);
+      };
 
-      displayMarker(clickedPlace, ClickedMarkerImage);
+      searchData && markAllSearch();
     };
   };
 

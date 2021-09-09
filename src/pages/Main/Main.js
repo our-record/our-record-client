@@ -55,7 +55,7 @@ const Main = () => {
     const month = `0${calendarDate.getMonth() + 1}`.slice(-2);
     const date = `0${calendarDate.getDate()}`.slice(-2);
     setConvertedDate(`${year}-${month}-${date}`);
-
+    setSearchTerm('');
     showRecord(convertedDate);
   }, [calendarDate, convertedDate]);
 
