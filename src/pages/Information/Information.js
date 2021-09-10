@@ -40,7 +40,6 @@ const Information = () => {
     isEdit &&
       axios({
         url: `http://${API}/user/register-info`,
-        method: 'get',
         withCredentials: true,
       }).then(res => {
         const { data } = res;
@@ -64,7 +63,7 @@ const Information = () => {
     e.preventDefault();
 
     const inviteeCondition = invitedBirthday && invitedNickName;
-    const editCondition = hangoutDate && birthDay && birthDay;
+    const editCondition = hangoutDate && birthDay && nickName;
     const invitorCondition = editCondition && profileImage;
 
     if (isEdit) {
@@ -79,31 +78,33 @@ const Information = () => {
   };
 
   const submitInformation = () => {
-    const userData = new FormData();
+    if (window.confirm(`정보를 ${isEdit ? '수정' : '등록'}하시겠습니까?`)) {
+      const userData = new FormData();
 
-    if (isEdit && !profileImage) {
-      return;
-    } else {
-      userData.append('couple_img', profileImage);
+      if (isEdit && profileImage) {
+        userData.append('couple_img', profileImage);
+      }
+
+      userData.append('dday', hangoutDate);
+      userData.append('invitor_birth', birthDay);
+      userData.append('invitor_nickname', nickName);
+      userData.append('invitee_birth', invitedBirthday);
+      userData.append('invitee_nickname', invitedNickName);
+
+      axios({
+        url: `http://${API}/user/${isEdit ? 'edit' : 'register-info'}`,
+        method: 'post',
+        headers: { _id: location.search.slice(6) },
+        data: userData,
+        withCredentials: true,
+      })
+        .catch(e => console.log(e))
+        .then(res => {
+          alert('정보 입력이 완료되었습니다');
+          history.push('/');
+          initializeData();
+        });
     }
-
-    userData.append('dday', hangoutDate);
-    userData.append('invitor_birth', birthDay);
-    userData.append('invitor_nickname', nickName);
-    userData.append('invitee_birth', invitedBirthday);
-    userData.append('invitee_nickname', invitedNickName);
-
-    axios({
-      url: `http://${API}/user/${isEdit ? 'edit' : 'register-info'}`,
-      method: 'post',
-      headers: { _id: location.search.slice(6) },
-      data: userData,
-      withCredentials: true,
-    }).then(res => {
-      alert('정보 입력이 완료되었습니다');
-      history.push('/');
-      initializeData();
-    });
   };
 
   const initializeData = () => {
@@ -126,7 +127,7 @@ const Information = () => {
     <InformationWrap>
       <ContentsWrap>
         <MainTitle>정보를 입력해 주세요</MainTitle>
-        <form onSubmit={e => checkInformation(e)} enctype="multipart/form-data">
+        <form onSubmit={e => checkInformation(e)} encType="multipart/form-data">
           {(isInvitor || isEdit) && (
             <>
               <CategoryWrap>
@@ -137,14 +138,16 @@ const Information = () => {
                       <Label>초대링크</Label>
                       <LinkCopy text={`http://${API}/kakao/${coupleId}`} />
                     </div>
-                    <LinkWrap>
-                      <InviteLink>
-                        {`http://${API}/kakao/${coupleId}`}
-                      </InviteLink>
-                      <LinkNotice>
-                        {isEdit ? `` : `(!) 상대방에게 초대링크를 보내주세요`}
-                      </LinkNotice>
-                    </LinkWrap>
+                    {!isEdit && (
+                      <LinkWrap>
+                        <InviteLink>
+                          {`http://${API}/kakao/${coupleId}`}
+                        </InviteLink>
+                        <LinkNotice>
+                          {isEdit ? `` : `(!) 상대방에게 초대링크를 보내주세요`}
+                        </LinkNotice>
+                      </LinkWrap>
+                    )}
                   </ListWrap>
                   <ListWrap>
                     <Label>사귄날짜</Label>
