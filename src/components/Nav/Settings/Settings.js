@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { flexSet } from '../../../styles/mixin';
 import { API } from '../../../config';
 
-const Settings = ({ isOpen, setOpen }) => {
+const Settings = ({ isOpen, setOpen, isInvitor, isInvitee, coupleId }) => {
   const history = useHistory();
   const settingsElement = useRef();
 
@@ -17,11 +17,25 @@ const Settings = ({ isOpen, setOpen }) => {
     return () => {
       window.removeEventListener('mousedown', handleClose);
     };
-  }, []);
+  });
+
+  const goInfoEdit = inviteCode => {
+    if (isInvitor && isInvitee) {
+      history.push('/information_edit');
+    } else {
+      isInvitor
+        ? prompt(
+            '상대방 정보 입력 완료 후 수정이 가능합니다. 아래 초대링크를 보내주세요.',
+            inviteCode
+          )
+        : alert('상대방 정보 입력 완료 후 수정이 가능합니다.');
+      setOpen(false);
+    }
+  };
 
   return (
     <SettingsWrap ref={settingsElement}>
-      <MenuWrap onClick={() => history.push('/information_edit')}>
+      <MenuWrap onClick={() => goInfoEdit(`http://${API}/kakao/${coupleId}`)}>
         <IconImage alt="information" src="/icon/information.png" />
         <ButtonText>정보 변경</ButtonText>
       </MenuWrap>

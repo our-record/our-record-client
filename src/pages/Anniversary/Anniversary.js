@@ -125,7 +125,7 @@ const Anniversary = () => {
 
   return (
     <>
-      <Nav />
+      <Nav coupleData={coupleInfo} />
       <AnniversaryWrap>
         <ContentsWrap>
           <MainTitle>기억하고 싶은 기념일을 등록해 주세요</MainTitle>

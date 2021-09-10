@@ -222,7 +222,7 @@ const Main = () => {
 
   return (
     <MainWrap>
-      <Nav />
+      <Nav coupleData={coupleData} />
       <BodyWrap>
         <SideWrap>
           <ProfileImage
