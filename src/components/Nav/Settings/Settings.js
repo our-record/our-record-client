@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { flexSet } from '../../../styles/mixin';
-import { API } from '../../../config';
+import { API } from '../../../api';
 
 const Settings = ({ isOpen, setOpen, isInvitor, isInvitee, coupleId }) => {
   const history = useHistory();

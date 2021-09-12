@@ -9,7 +9,7 @@ import {
   flexSet,
 } from '../../styles/mixin';
 import { removeEvent, editEvent, postEvent } from '../../api';
-import { API } from '../../config';
+import { API } from '../../api';
 
 const Anniversary = () => {
   const [minimumDate, setMinimumDate] = useState();
