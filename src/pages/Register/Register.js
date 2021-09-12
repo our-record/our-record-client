@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { flexSet } from '../../styles/mixin';
-import { API } from '../../config';
+import { API } from '../../api';
 
 const Register = () => {
   return (

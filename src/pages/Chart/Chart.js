@@ -1,7 +1,7 @@
 import react, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { API } from '../../config';
+import { API } from '../../api';
 import Last7Days from '../../components/Chart/Last7Days';
 import Monthly from '../../components/Chart/Monthly';
 

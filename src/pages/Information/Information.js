@@ -4,7 +4,7 @@ import LinkCopy from '../../components/Information/LinkCopy';
 import styled from 'styled-components';
 import { buttonSet, flexSet } from '../../styles/mixin';
 import axios from 'axios';
-import { API } from '../../config';
+import { API } from '../../api';
 
 const Information = () => {
   const location = useLocation();
@@ -27,13 +27,8 @@ const Information = () => {
     let month = now.getMonth() + 1;
     let date = now.getDate();
 
-    if (date < 10) {
-      date = '0' + date;
-    }
-
-    if (month < 10) {
-      month = '0' + month;
-    }
+    date < 10 && (date = '0' + date);
+    month < 10 && (month = '0' + month);
 
     setToday(`${year}-${month}-${date}`);
 
@@ -100,7 +95,7 @@ const Information = () => {
       })
         .catch(e => console.log(e))
         .then(res => {
-          alert('정보 입력이 완료되었습니다');
+          alert(`정보를 ${isEdit ? '수정' : '등록'}이 완료되었습니다.`);
           history.push('/');
           initializeData();
         });
