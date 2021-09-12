@@ -140,7 +140,7 @@ const RecordWrap = styled.div`
   bottom: 0;
   left: 0;
   z-index: 999;
-  background-color: rgba(120, 120, 120, 0.4);
+  background-color: rgba(120, 120, 120, 0.8);
 `;
 
 const ContentsWrap = styled.div`
