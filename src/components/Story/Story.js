@@ -28,7 +28,7 @@ const StoryWrap = styled.div`
   bottom: 0;
   left: 0;
   height: 100vh;
-  background-color: rgba(120, 120, 120, 0.5);
+  background-color: rgba(120, 120, 120, 0.8);
   z-index: 999;
 `;
 
