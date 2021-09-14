@@ -1,4 +1,4 @@
-import { css } from 'styled-components';
+import { css, keyframes } from 'styled-components';
 
 export const flexSet = (
   direction = 'row',
@@ -80,4 +80,16 @@ export const dateInputSet = (height = '18px') => css`
   ::-webkit-calendar-picker-indicator {
     filter: invert(0.5);
   }
+`;
+
+export const fadeIn = keyframes`
+0% {
+  opacity: 1;
+}
+50% {
+  opacity: 0;
+}
+100% {
+  opacity: 1;
+}
 `;
