@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Nav from '../../components/Nav/Nav';
+import Loading from '../../components/Common/Loading';
 import styled from 'styled-components';
 import {
   tableSet,
@@ -23,6 +24,7 @@ const Anniversary = () => {
   const [date, setDate] = useState('');
   const [eventId, setEventId] = useState();
   const [isEdit, setIsEdit] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const today = new Date();
@@ -48,6 +50,7 @@ const Anniversary = () => {
       withCredentials: true,
     }).then(res => {
       setEventData(res.data);
+      setIsLoading(false);
     });
   };
 
@@ -125,104 +128,110 @@ const Anniversary = () => {
 
   return (
     <>
-      <Nav coupleData={coupleInfo} />
-      <AnniversaryWrap>
-        <ContentsWrap>
-          <MainTitle>기억하고 싶은 기념일을 등록해 주세요</MainTitle>
-          <AnniversaryTable>
-            <thead>
-              <tr>
-                <TableHead style={{ width: '40%' }}>기념일</TableHead>
-                <TableHead style={{ width: '40%' }}>날짜</TableHead>
-                <TableHead style={{ width: '20%' }}>삭제/수정</TableHead>
-              </tr>
-            </thead>
-            <tbody>
-              {invitorBirth && (
-                <tr>
-                  <DefaultEvent>
-                    {coupleInfo.invitor_nickname
-                      ? coupleInfo.invitor_nickname
-                      : '사용자1'}{' '}
-                    생일
-                  </DefaultEvent>
-                  <DefaultEvent>{invitorBirth}</DefaultEvent>
-                  <DefaultEvent></DefaultEvent>
-                </tr>
-              )}
-              {inviteeBirth && (
-                <tr>
-                  <DefaultEvent>
-                    {coupleInfo.invitee_nickname
-                      ? coupleInfo.invitee_nickname
-                      : '사용자2'}{' '}
-                    생일
-                  </DefaultEvent>
-                  <DefaultEvent>{inviteeBirth}</DefaultEvent>
-                  <DefaultEvent></DefaultEvent>
-                </tr>
-              )}
-              {dDay && (
-                <tr>
-                  <DefaultEvent>{dDayCount}주년</DefaultEvent>
-                  <DefaultEvent>{dDay}</DefaultEvent>
-                  <DefaultEvent></DefaultEvent>
-                </tr>
-              )}
-              {eventData &&
-                eventData.map(data => {
-                  return (
-                    <TableRow key={data._id}>
-                      <TableData>{data.eventName}</TableData>
-                      <TableData>{data.date.slice(0, 10)}</TableData>
-                      <TableData>
-                        {' '}
-                        <DeleteImage
-                          id={data._id}
-                          alt="delete"
-                          src="/icon/delete.png"
-                          onClick={e => deleteEvent(e)}
-                        />
-                        <EditImage
-                          id={data._id}
-                          alt="edit"
-                          src="/icon/edit.png"
-                          onClick={e => editEventSet(e)}
-                        />
-                      </TableData>
-                    </TableRow>
-                  );
-                })}
-            </tbody>
-            <tfoot>
-              <tr>
-                <TableData>
-                  <AnniversaryInput
-                    type="text"
-                    value={anniversary}
-                    placeholder="기념일을 작성해주세요"
-                    onChange={event => setAnniversary(event.target.value)}
-                  />
-                </TableData>
-                <TableData>
-                  <DateInput
-                    type="date"
-                    value={date}
-                    min={minimumDate}
-                    onChange={event => setDate(event.target.value)}
-                  />
-                </TableData>
-                <TableData>
-                  {' '}
-                  <EnrollButton onClick={submitEvent}>
-                    {isEdit ? '수정' : '등록'}
-                  </EnrollButton>
-                </TableData>
-              </tr>
-            </tfoot>
-          </AnniversaryTable>
-        </ContentsWrap>
-      </AnniversaryWrap>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <>
+          <Nav coupleData={coupleInfo} />
+          <AnniversaryWrap>
+            <ContentsWrap>
+              <MainTitle>기억하고 싶은 기념일을 등록해 주세요</MainTitle>
+              <AnniversaryTable>
+                <thead>
+                  <tr>
+                    <TableHead style={{ width: '40%' }}>기념일</TableHead>
+                    <TableHead style={{ width: '40%' }}>날짜</TableHead>
+                    <TableHead style={{ width: '20%' }}>삭제/수정</TableHead>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invitorBirth && (
+                    <tr>
+                      <DefaultEvent>
+                        {coupleInfo.invitor_nickname
+                          ? coupleInfo.invitor_nickname
+                          : '사용자1'}{' '}
+                        생일
+                      </DefaultEvent>
+                      <DefaultEvent>{invitorBirth}</DefaultEvent>
+                      <DefaultEvent></DefaultEvent>
+                    </tr>
+                  )}
+                  {inviteeBirth && (
+                    <tr>
+                      <DefaultEvent>
+                        {coupleInfo.invitee_nickname
+                          ? coupleInfo.invitee_nickname
+                          : '사용자2'}{' '}
+                        생일
+                      </DefaultEvent>
+                      <DefaultEvent>{inviteeBirth}</DefaultEvent>
+                      <DefaultEvent></DefaultEvent>
+                    </tr>
+                  )}
+                  {dDay && (
+                    <tr>
+                      <DefaultEvent>{dDayCount}주년</DefaultEvent>
+                      <DefaultEvent>{dDay}</DefaultEvent>
+                      <DefaultEvent></DefaultEvent>
+                    </tr>
+                  )}
+                  {eventData &&
+                    eventData.map(data => {
+                      return (
+                        <TableRow key={data._id}>
+                          <TableData>{data.eventName}</TableData>
+                          <TableData>{data.date.slice(0, 10)}</TableData>
+                          <TableData>
+                            {' '}
+                            <DeleteImage
+                              id={data._id}
+                              alt="delete"
+                              src="/icon/delete.png"
+                              onClick={e => deleteEvent(e)}
+                            />
+                            <EditImage
+                              id={data._id}
+                              alt="edit"
+                              src="/icon/edit.png"
+                              onClick={e => editEventSet(e)}
+                            />
+                          </TableData>
+                        </TableRow>
+                      );
+                    })}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <TableData>
+                      <AnniversaryInput
+                        type="text"
+                        value={anniversary}
+                        placeholder="기념일을 작성해주세요"
+                        onChange={event => setAnniversary(event.target.value)}
+                      />
+                    </TableData>
+                    <TableData>
+                      <DateInput
+                        type="date"
+                        value={date}
+                        min={minimumDate}
+                        onChange={event => setDate(event.target.value)}
+                      />
+                    </TableData>
+                    <TableData>
+                      {' '}
+                      <EnrollButton onClick={submitEvent}>
+                        {isEdit ? '수정' : '등록'}
+                      </EnrollButton>
+                    </TableData>
+                  </tr>
+                </tfoot>
+              </AnniversaryTable>
+            </ContentsWrap>
+          </AnniversaryWrap>
+        </>
+      )}
     </>
   );
 };

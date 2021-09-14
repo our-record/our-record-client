@@ -4,6 +4,7 @@ import Record from '../../components/Record/Record';
 import Story from '../../components/Story/Story';
 import SearchPlaceInput from '../../components/Main/Map/SearchPlaceInput';
 import Nav from '../../components/Nav/Nav';
+import Loading from '../../components/Common/Loading';
 import Calendar from 'react-calendar';
 import styled from 'styled-components';
 import 'react-calendar/dist/Calendar.css';
@@ -212,200 +213,206 @@ const Main = () => {
     setIsRecordEditOpen(true);
   };
 
-  if (isLoading) {
-    return (
-      <div>
-        <h1>데이터를 불러오는 중입니다...</h1>
-      </div>
-    );
-  }
-
   return (
-    <MainWrap>
-      <Nav coupleData={coupleData} />
-      <BodyWrap>
-        <SideWrap>
-          <ProfileImage
-            alt="profile"
-            src={`${
-              coupleData && coupleData.couple_img
-                ? coupleData.couple_img
-                : '/icon/couple.png'
-            }`}
-          />
-          <NickNameWrap>
-            {coupleData && coupleData.invitor_nickname ? (
-              <NickName>{coupleData.invitor_nickname}</NickName>
-            ) : (
-              <NoNickName> 등록해 주세요</NoNickName>
-            )}
-            <HeartIcon alt="heart" src="/icon/heart.png" />{' '}
-            {coupleData && coupleData.invitee_nickname ? (
-              <NickName>{coupleData.invitee_nickname}</NickName>
-            ) : (
-              <NoNickName> 등록해 주세요</NoNickName>
-            )}
-          </NickNameWrap>
-          <DDay>{coupleData && coupleData.dday ? `D + ${dDay}일` : ''}</DDay>
-          <RecordCalendar>
-            <Calendar
-              value={calendarDate}
-              maxDate={new Date()}
-              onChange={date => setCalendarDate(date)}
-            />
-          </RecordCalendar>
-          <RecordButton onClick={() => setIsRecordOpen(true)}>
-            기록하기
-          </RecordButton>
-          <Record
-            isOpen={isRecordOpen}
-            time={time}
-            setTime={setTime}
-            costCategory={costCategory}
-            setCostCategory={setCostCategory}
-            costContent={costContent}
-            setCostContent={setCostContent}
-            cost={cost}
-            setCost={setCost}
-            picture={picture}
-            setPicture={setPicture}
-            story={story}
-            setStory={setStory}
-            notice={notice}
-            handleData={handleData}
-            submitRecord={submitRecord}
-            close={cancleRecord}
-            placeName={placeName}
-            convertedDate={convertedDate}
-          />
-          <Link to="/chart">
-            <StatisticsButton>이 달의 통계</StatisticsButton>
-          </Link>
-        </SideWrap>
-        <ContentsWrap>
-          <MapWrap>
-            <SearchPlaceInput
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              setPlaceName={setPlaceName}
-              setLong={setLong}
-              setLat={setLat}
-              recordMarkers={dailyRecordData}
-            />
-          </MapWrap>
-          {dailyRecordData.length !== 0 ? (
-            <ListWrap>
-              <ListTitle>그 날의 기록</ListTitle>
-              <ListTable>
-                <thead>
-                  <tr>
-                    <TableHead style={{ width: '7%' }}>스토리</TableHead>
-                    <TableHead style={{ width: '8%' }}>시간</TableHead>
-                    <TableHead style={{ width: '18%' }}>장소</TableHead>
-                    <TableHead style={{ width: '9%' }}>항목</TableHead>
-                    <TableHead style={{ width: '27%' }}>내용</TableHead>
-                    <TableHead style={{ width: '13%' }}>사용금액</TableHead>
-                    <TableHead style={{ width: '8%' }}>삭제/수정</TableHead>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dailyRecordData.map(data => {
-                    return (
-                      <tr key={data._id}>
-                        <TableData>
-                          {data.datePhoto || data.story ? (
-                            <>
-                              <StoryImage
-                                id={data._id}
-                                alt="story"
-                                src="/icon/binoculars.png"
-                                onClick={e => {
-                                  openStory(e);
-                                }}
-                              />
-                              <Story
-                                isOpen={isStoryOpen}
-                                closeStory={closeStory}
-                                storyData={storyData}
-                              />
-                            </>
-                          ) : (
-                            `-`
-                          )}
-                        </TableData>
-                        <TableData>{data.time}</TableData>
-                        <TableData>{data.place ? data.place : `-`}</TableData>
-                        <TableData>{COST_CATEGORY[data.category]}</TableData>
-                        <TableData>{data.expenseInfo}</TableData>
-                        <TableData>{data.expense.toLocaleString()}원</TableData>
-                        <TableData>
-                          <DeleteButton
-                            id={data._id}
-                            alt="delete"
-                            src="/icon/delete.png"
-                            onClick={() => deleteRecord(data._id)}
-                          />
-                          <EditButton
-                            id={data._id}
-                            alt="edit"
-                            src="/icon/edit.png"
-                            onClick={e => editRecord(e)}
-                          />
-                          <Record
-                            isOpen={isRecordEditOpen}
-                            recordId={recordId}
-                            time={time}
-                            setTime={setTime}
-                            costCategory={costCategory}
-                            setCostCategory={setCostCategory}
-                            costContent={costContent}
-                            setCostContent={setCostContent}
-                            cost={cost}
-                            setCost={setCost}
-                            picture={picture}
-                            setPicture={setPicture}
-                            story={story}
-                            setStory={setStory}
-                            notice={notice}
-                            handleData={handleData}
-                            submitRecord={submitRecord}
-                            close={cancleRecord}
-                            placeName={placeName}
-                            convertedDate={convertedDate}
-                          />
-                        </TableData>
+    <>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <MainWrap>
+          <Nav coupleData={coupleData} />
+          <BodyWrap>
+            <SideWrap>
+              <ProfileImage
+                alt="profile"
+                src={`${
+                  coupleData && coupleData.couple_img
+                    ? coupleData.couple_img
+                    : '/icon/couple.png'
+                }`}
+              />
+              <NickNameWrap>
+                {coupleData && coupleData.invitor_nickname ? (
+                  <NickName>{coupleData.invitor_nickname}</NickName>
+                ) : (
+                  <NoNickName> 등록해 주세요</NoNickName>
+                )}
+                <HeartIcon alt="heart" src="/icon/heart.png" />{' '}
+                {coupleData && coupleData.invitee_nickname ? (
+                  <NickName>{coupleData.invitee_nickname}</NickName>
+                ) : (
+                  <NoNickName> 등록해 주세요</NoNickName>
+                )}
+              </NickNameWrap>
+              <DDay>
+                {coupleData && coupleData.dday ? `D + ${dDay}일` : ''}
+              </DDay>
+              <RecordCalendar>
+                <Calendar
+                  value={calendarDate}
+                  maxDate={new Date()}
+                  onChange={date => setCalendarDate(date)}
+                />
+              </RecordCalendar>
+              <RecordButton onClick={() => setIsRecordOpen(true)}>
+                기록하기
+              </RecordButton>
+              <Record
+                isOpen={isRecordOpen}
+                time={time}
+                setTime={setTime}
+                costCategory={costCategory}
+                setCostCategory={setCostCategory}
+                costContent={costContent}
+                setCostContent={setCostContent}
+                cost={cost}
+                setCost={setCost}
+                picture={picture}
+                setPicture={setPicture}
+                story={story}
+                setStory={setStory}
+                notice={notice}
+                handleData={handleData}
+                submitRecord={submitRecord}
+                close={cancleRecord}
+                placeName={placeName}
+                convertedDate={convertedDate}
+              />
+              <Link to="/chart">
+                <StatisticsButton>이 달의 통계</StatisticsButton>
+              </Link>
+            </SideWrap>
+            <ContentsWrap>
+              <MapWrap>
+                <SearchPlaceInput
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  setPlaceName={setPlaceName}
+                  setLong={setLong}
+                  setLat={setLat}
+                  recordMarkers={dailyRecordData}
+                />
+              </MapWrap>
+              {dailyRecordData.length !== 0 ? (
+                <ListWrap>
+                  <ListTitle>그 날의 기록</ListTitle>
+                  <ListTable>
+                    <thead>
+                      <tr>
+                        <TableHead style={{ width: '7%' }}>스토리</TableHead>
+                        <TableHead style={{ width: '8%' }}>시간</TableHead>
+                        <TableHead style={{ width: '18%' }}>장소</TableHead>
+                        <TableHead style={{ width: '9%' }}>항목</TableHead>
+                        <TableHead style={{ width: '27%' }}>내용</TableHead>
+                        <TableHead style={{ width: '13%' }}>사용금액</TableHead>
+                        <TableHead style={{ width: '8%' }}>삭제/수정</TableHead>
                       </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <BottomTableData colSpan="5">합계</BottomTableData>
-                    <BottomTableData>
-                      {Number(totalCost).toLocaleString()}원
-                    </BottomTableData>
-                    <BottomTableData
-                      className="allDeleteButton"
-                      onClick={() => deleteAllRecord()}
-                    >
-                      전체삭제
-                    </BottomTableData>
-                  </tr>
-                </tfoot>
-              </ListTable>
-            </ListWrap>
-          ) : (
-            <EmptyData>
-              <EmptyDataImage alt="sad face" src="/icon/sad.png" />
-              <br />
-              기록이 없어요
-              <br />
-              새로운 추억을 남겨 보세요!
-            </EmptyData>
-          )}
-        </ContentsWrap>
-      </BodyWrap>
-    </MainWrap>
+                    </thead>
+                    <tbody>
+                      {dailyRecordData.map(data => {
+                        return (
+                          <tr key={data._id}>
+                            <TableData>
+                              {data.datePhoto || data.story ? (
+                                <>
+                                  <StoryImage
+                                    id={data._id}
+                                    alt="story"
+                                    src="/icon/binoculars.png"
+                                    onClick={e => {
+                                      openStory(e);
+                                    }}
+                                  />
+                                  <Story
+                                    isOpen={isStoryOpen}
+                                    closeStory={closeStory}
+                                    storyData={storyData}
+                                  />
+                                </>
+                              ) : (
+                                `-`
+                              )}
+                            </TableData>
+                            <TableData>{data.time}</TableData>
+                            <TableData>
+                              {data.place ? data.place : `-`}
+                            </TableData>
+                            <TableData>
+                              {COST_CATEGORY[data.category]}
+                            </TableData>
+                            <TableData>{data.expenseInfo}</TableData>
+                            <TableData>
+                              {data.expense.toLocaleString()}원
+                            </TableData>
+                            <TableData>
+                              <DeleteButton
+                                id={data._id}
+                                alt="delete"
+                                src="/icon/delete.png"
+                                onClick={() => deleteRecord(data._id)}
+                              />
+                              <EditButton
+                                id={data._id}
+                                alt="edit"
+                                src="/icon/edit.png"
+                                onClick={e => editRecord(e)}
+                              />
+                              <Record
+                                isOpen={isRecordEditOpen}
+                                recordId={recordId}
+                                time={time}
+                                setTime={setTime}
+                                costCategory={costCategory}
+                                setCostCategory={setCostCategory}
+                                costContent={costContent}
+                                setCostContent={setCostContent}
+                                cost={cost}
+                                setCost={setCost}
+                                picture={picture}
+                                setPicture={setPicture}
+                                story={story}
+                                setStory={setStory}
+                                notice={notice}
+                                handleData={handleData}
+                                submitRecord={submitRecord}
+                                close={cancleRecord}
+                                placeName={placeName}
+                                convertedDate={convertedDate}
+                              />
+                            </TableData>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <BottomTableData colSpan="5">합계</BottomTableData>
+                        <BottomTableData>
+                          {Number(totalCost).toLocaleString()}원
+                        </BottomTableData>
+                        <BottomTableData
+                          className="allDeleteButton"
+                          onClick={() => deleteAllRecord()}
+                        >
+                          전체삭제
+                        </BottomTableData>
+                      </tr>
+                    </tfoot>
+                  </ListTable>
+                </ListWrap>
+              ) : (
+                <EmptyData>
+                  <EmptyDataImage alt="sad face" src="/icon/sad.png" />
+                  <br />
+                  기록이 없어요
+                  <br />
+                  새로운 추억을 남겨 보세요!
+                </EmptyData>
+              )}
+            </ContentsWrap>
+          </BodyWrap>
+        </MainWrap>
+      )}
+    </>
   );
 };
 
