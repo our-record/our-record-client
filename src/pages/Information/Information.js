@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import LinkCopy from '../../components/Information/LinkCopy';
 import styled from 'styled-components';
+import Loading from '../../components/Common/Loading';
 import { buttonSet, flexSet } from '../../styles/mixin';
 import axios from 'axios';
 import { API } from '../../api';
@@ -18,6 +19,7 @@ const Information = () => {
   const [invitedNickName, setInvitedNickName] = useState('');
   const [profileImage, setProfileImage] = useState();
   const [inputNotification, setInputNotification] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const isInvitor = location.search.length !== 0;
   const isEdit = location.pathname === '/information_edit';
 
@@ -46,6 +48,7 @@ const Information = () => {
         data.invitor_birth && setBirthDay(data.invitor_birth.substring(0, 10));
         data.invitee_birth &&
           setInvitedBirthday(data.invitee_birth.substring(0, 10));
+        setIsLoading(false);
       });
   }, []);
 
@@ -117,6 +120,10 @@ const Information = () => {
       initializeData();
     }
   };
+
+  if (isEdit && isLoading) {
+    return <Loading />;
+  }
 
   return (
     <InformationWrap>

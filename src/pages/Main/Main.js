@@ -78,7 +78,7 @@ const Main = () => {
     } catch (e) {
       console.log(`error: ${e}`);
     } finally {
-      // setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
