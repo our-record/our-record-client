@@ -1,9 +1,11 @@
-import react from 'react';
+import React from 'react';
 import { Bar } from 'react-chartjs-2';
 
 const options = {
-  legend: {
-    display: false, // label 숨기기
+  plugins: {
+    legend: {
+      display: false,
+    },
   },
   scales: {
     yAxes: [
@@ -50,6 +52,7 @@ const Last7Days = props => {
     labels: days.reverse(),
     datasets: [
       {
+        label: '',
         backgroundColor: [
           'rgba(255, 99, 132, 0.2)',
           'rgba(54, 162, 235, 0.2)',

@@ -100,6 +100,26 @@ const Anniversary = () => {
         }
       }
     }
+
+    const fetchData = {};
+    isEdit && (fetchData._id = eventId);
+    fetchData.eventName = anniversary;
+    fetchData.date = date;
+
+    if (window.confirm(`기념일을 ${isEdit ? '수정' : '등록'}하시겠습니까?`)) {
+      await axios({
+        url: `http://${API}/anniversary/${isEdit ? 'edit' : 'write'}`,
+        method: 'post',
+        data: fetchData,
+        withCredentials: true,
+      }).then(
+        setAnniversary(''),
+        setDate(''),
+        setEventId(''),
+        setIsEdit(false)
+      );
+    }
+    getUserEvent();
   };
 
   const deleteEvent = async event => {
