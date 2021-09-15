@@ -31,10 +31,13 @@
 - 상단 Navigation 컴포넌트 제작
 
 ### 1. 회원가입 / 로그인 페이지 (신미영)
+![login](https://user-images.githubusercontent.com/76767572/133452020-01e1d17f-cb91-4daf-93ae-c6669e0cc2a9.gif)
 
 - kakao 소셜 로그인 화면 레이아웃 제작 
 
 ### 2. 사용자 정보 등록 / 수정 페이지 (신미영)
+![information](https://user-images.githubusercontent.com/76767572/133456548-5fa146fd-5511-404a-8b4a-052c37f46ccb.gif)
+
 - 사용자 정보 등록 컴포넌트 제작 후 등록, 수정 페이지로 재사용
 - useLocation을 활용해 사용자를 구분해 페이지 노출 되도록 기능 구현
 - 이미지 파일 등록, 날짜 선택, 텍스트 등 input 기능 구현
@@ -56,16 +59,22 @@
 - 수정 페이지 로드 시 백엔드로부터 데이터 전달 받아 각 초기값으로 노출
 
 ### 5. 스토리 보기 모달 (신미영)
+![story](https://user-images.githubusercontent.com/76767572/133456226-66ea720f-676b-4146-bf49-223c4f3cfc83.gif)
+
 
 - 날짜별 기록 스토리 보기 버튼 클릭 시 모달 호출 기능 구현 
 - 백엔드로 부터 기록 데이터 fetch 받아 이미지와 글 노출 
 
-### 6. 기념일 등록 / 수정 페이지 (신미영)
+### 6. 기념일 등록 페이지 (신미영)
+![anniversary](https://user-images.githubusercontent.com/76767572/133457866-e2ae725d-6b89-4954-aefb-175b5533f481.gif)
+
 
 - 페이지 로드 시 백엔드로부터 사용자 정보 fetch 받아 사용자 다음 생일, n주년 노출 기능 구현
 - 사용자가 등록한 기념일 데이터 백엔드로 전달하여 저장 후 table 노출 되도록 기능 구현
+- 등록한 기념일 수정 및 삭제 기능 구현
 
 ### 7. 통계 페이지 (박준우)
+![statistics](https://user-images.githubusercontent.com/76767572/133458630-6edde220-fdea-491a-b876-245af64714a9.gif)
 
 - 통계 기능!
   
@@ -94,6 +103,7 @@
   (백엔드 [깃허브](https://github.com/our-record/our-record-server))
 
 <br>
+
 
 
 ## Reference
