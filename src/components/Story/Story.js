@@ -33,8 +33,8 @@ const StoryWrap = styled.div`
 `;
 
 const ContentsWrap = styled.div`
-  min-width: 150px;
-  max-width: 300px;
+  min-width: 300px;
+  max-width: 500px;
 `;
 
 const CloseButton = styled.div`
@@ -44,13 +44,14 @@ const CloseButton = styled.div`
   cursor: pointer;
 `;
 const StoryImage = styled.img`
-  min-width: 150px;
-  max-width: 300px;
+  min-width: 300px;
+  max-width: 500px;
   margin-bottom: 10px;
 `;
 
 const StoryText = styled.div`
   color: white;
+  font-size: 1.5em;
 `;
 
 export default Story;

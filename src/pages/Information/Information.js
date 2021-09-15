@@ -79,9 +79,9 @@ const Information = () => {
     if (window.confirm(`정보를 ${isEdit ? '수정' : '등록'}하시겠습니까?`)) {
       const userData = new FormData();
 
-      if (isEdit && profileImage) {
-        userData.append('couple_img', profileImage);
-      }
+      isEdit
+        ? profileImage && userData.append('couple_img', profileImage)
+        : userData.append('couple_img', profileImage);
 
       userData.append('dday', hangoutDate);
       userData.append('invitor_birth', birthDay);
@@ -96,12 +96,12 @@ const Information = () => {
         data: userData,
         withCredentials: true,
       })
-        .catch(e => console.log(e))
         .then(res => {
-          alert(`정보를 ${isEdit ? '수정' : '등록'}이 완료되었습니다.`);
+          alert(`정보 ${isEdit ? '수정' : '등록'}이 완료되었습니다.`);
           history.push('/');
           initializeData();
-        });
+        })
+        .catch(e => console.log(e));
     }
   };
 

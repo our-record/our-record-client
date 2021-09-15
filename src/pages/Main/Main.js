@@ -35,7 +35,7 @@ const Main = () => {
   const [costContent, setCostContent] = useState();
   const [cost, setCost] = useState();
   const [picture, setPicture] = useState();
-  const [story, setStory] = useState('');
+  const [story, setStory] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
   const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
@@ -312,7 +312,7 @@ const Main = () => {
                         return (
                           <tr key={data._id}>
                             <TableData>
-                              {data.datePhoto || data.story ? (
+                              {data.datePhoto && data.story ? (
                                 <>
                                   <StoryImage
                                     id={data._id}
