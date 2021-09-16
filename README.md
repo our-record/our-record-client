@@ -2,7 +2,15 @@
 
 ### 연인들의 데이트 내용 기록 및 통계를 공유하는 웹 앱
 <br>
+
 <img width="1435" alt="our-record" src="https://user-images.githubusercontent.com/76767572/133405209-efe9247b-2af0-4531-bd34-4fcbe85152ff.png">
+
+### 시연 영상 확인
+<a href="https://youtu.be/0f0u_wUW_nY">
+    <img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white/"
+        style="width: 80px; height : auto; margin-left : 10px; margin-right : 10px;"/>
+</a>  
+<br><br>
 
 ### 프로젝트 계획 및 기간
 
@@ -10,13 +18,6 @@
 
 - 1st Sprint : 개발환경 초기세팅, 전체 레이아웃, 컴포넌트화
 - 2nd Sprint : 컴포넌트 별 기능 구현, 프론트-백 통신, 코드 리팩토링, conflict 수정 작업
-<br><br>
-
-### 시연 영상 확인
-<a href="https://youtu.be/0f0u_wUW_nY">
-    <img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white/"
-        style="width: 80px; height : auto; margin-left : 10px; margin-right : 10px;"/>
-</a>  
 <br><br>
 
 ---
@@ -28,7 +29,7 @@
 - CRA를 사용한 초기 세팅
 - styled-component를 사용한 스타일링
 - axios instance를 생성해 백엔드 api 통신
-- 상단 Navigation 컴포넌트 제작
+- 상단 Navigation 컴포넌트 및 로딩 컴포넌트 제작
 
 ### 1. 회원가입 / 로그인 페이지 (신미영)
 ![login](https://user-images.githubusercontent.com/76767572/133452020-01e1d17f-cb91-4daf-93ae-c6669e0cc2a9.gif)
@@ -45,6 +46,7 @@
 - 수정 페이지 로드 시 백엔드로부터 데이터 전달 받아 각 초기값으로 노출
 
 ### 3. 메인 페이지 (신미영)
+![메인페이지](https://user-images.githubusercontent.com/76767572/133556201-a0a1aeb5-2545-4c2a-bc61-bb19374fd08d.png)
 
 - 로그인 시 사용자 정보를 fetch 받아 사용자 1 닉네임, 사용자 2 닉네임, 사귄 날짜(D-day) 노출
 - react-calendar library를 사용하여 데이터 기록용 달력 노출
