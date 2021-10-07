@@ -4,7 +4,7 @@ import Settings from './Settings/Settings';
 import styled from 'styled-components';
 import { flexSet } from '../../styles/mixin';
 
-const Nav = coupleData => {
+const Nav = () => {
   const [isHomeActivate, setIsHomeActivate] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEventActivate, setIsEventActivate] = useState(false);
@@ -48,13 +48,7 @@ const Nav = coupleData => {
             onClick={() => setIsSettingsOpen(true)}
           />
           {isSettingsOpen && (
-            <Settings
-              isOpen={isSettingsOpen}
-              setOpen={setIsSettingsOpen}
-              isInvitor={coupleData.coupleData.invitor_nickname}
-              isInvitee={coupleData.coupleData.invitee_nickname}
-              coupleId={coupleData.coupleData._id}
-            />
+            <Settings isOpen={isSettingsOpen} setOpen={setIsSettingsOpen} />
           )}
         </div>
       </RightWrap>

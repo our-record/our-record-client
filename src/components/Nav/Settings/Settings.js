@@ -1,12 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { getUsersInfo } from '../../../modules/users';
 import styled from 'styled-components';
 import { flexSet } from '../../../styles/mixin';
 import { API } from '../../../api';
 
-const Settings = ({ isOpen, setOpen, isInvitor, isInvitee, coupleId }) => {
+const Settings = ({ isOpen, setOpen }) => {
   const history = useHistory();
   const settingsElement = useRef();
+
+  const {
+    usersData: { invitor_nickname, invitee_nickname, _id },
+  } = useSelector(state => state.users);
+  const dispatch = useDispatch();
 
   const handleClose = ({ target }) => {
     if (isOpen && !settingsElement.current.contains(target)) setOpen(false);
@@ -19,11 +26,15 @@ const Settings = ({ isOpen, setOpen, isInvitor, isInvitee, coupleId }) => {
     };
   });
 
+  // useEffect(() => {
+  //   dispatch(getUsersInfo());
+  // }, []);
+
   const goInfoEdit = inviteCode => {
-    if (isInvitor && isInvitee) {
+    if (invitor_nickname && invitee_nickname) {
       history.push('/information_edit');
     } else {
-      isInvitor
+      invitor_nickname
         ? prompt(
             '상대방 정보 입력 완료 후 수정이 가능합니다. 아래 초대링크를 보내주세요.',
             inviteCode
@@ -35,7 +46,7 @@ const Settings = ({ isOpen, setOpen, isInvitor, isInvitee, coupleId }) => {
 
   return (
     <SettingsWrap ref={settingsElement}>
-      <MenuWrap onClick={() => goInfoEdit(`http://${API}/kakao/${coupleId}`)}>
+      <MenuWrap onClick={() => goInfoEdit(`http://${API}/kakao/${_id}`)}>
         <IconImage alt="information" src="/icon/information.png" />
         <ButtonText>정보 변경</ButtonText>
       </MenuWrap>

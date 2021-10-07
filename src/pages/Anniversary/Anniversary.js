@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Nav from '../../components/Nav/Nav';
 import Loading from '../../components/Common/Loading';
+import { useSelector, useDispatch } from 'react-redux';
+import { getEvents } from '../../modules/events';
+import { getUsersInfo } from '../../modules/users';
 import styled from 'styled-components';
 import {
   tableSet,
@@ -10,21 +12,25 @@ import {
   flexSet,
 } from '../../styles/mixin';
 import { removeEvent, editEvent, postEvent } from '../../api';
-import { API } from '../../api';
 
 const Anniversary = () => {
   const [minimumDate, setMinimumDate] = useState();
-  const [coupleInfo, setCoupleInfo] = useState();
   const [invitorBirth, setInvitorBirth] = useState();
   const [inviteeBirth, setInviteeBirth] = useState();
   const [dDay, setDDay] = useState();
   const [dDayCount, setDDayCount] = useState();
-  const [eventData, setEventData] = useState();
   const [anniversary, setAnniversary] = useState('');
   const [date, setDate] = useState('');
   const [eventId, setEventId] = useState();
   const [isEdit, setIsEdit] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const { eventsData, eventsLoading, eventsError } = useSelector(
+    state => state.events
+  );
+  const { usersData, usersLoading, usersError } = useSelector(
+    state => state.users
+  );
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const today = new Date();
@@ -33,26 +39,11 @@ const Anniversary = () => {
     const date = `0${today.getDate()}`.slice(-2);
     setMinimumDate(`${year}-${month}-${date}`);
 
-    axios({
-      url: `http://${API}/user/register-info`,
-      withCredentials: true,
-    }).then(res => {
-      setCoupleInfo(res.data);
-      calcDefaultEvent(res.data);
-    });
-
-    getUserEvent();
+    dispatch(getUsersInfo());
+    dispatch(getEvents());
   }, []);
 
-  const getUserEvent = () => {
-    axios({
-      url: `http://${API}/anniversary`,
-      withCredentials: true,
-    }).then(res => {
-      setEventData(res.data);
-      setIsLoading(false);
-    });
-  };
+  useEffect(() => calcDefaultEvent(usersData), [usersData]);
 
   const calcDefaultEvent = data => {
     data.invitor_birth && getEventTable(data.invitor_birth, setInvitorBirth);
@@ -78,7 +69,7 @@ const Anniversary = () => {
       : func(`${calcAge < age ? year : year + 1}-${month}-${date}`);
   };
 
-  const submitEvent = async () => {
+  const submitEvent = () => {
     const validation = anniversary && date;
 
     if (!validation) {
@@ -91,67 +82,52 @@ const Anniversary = () => {
 
       if (window.confirm(`기념일을 ${isEdit ? '수정' : '등록'}하시겠습니까?`)) {
         try {
-          isEdit ? await editEvent(fetchData) : await postEvent(fetchData);
+          isEdit ? editEvent(fetchData) : postEvent(fetchData);
+        } catch (e) {
+          console.log(e);
+        } finally {
           setAnniversary('');
           setDate('');
           setEventId('');
           setIsEdit(false);
-          getUserEvent();
-        } catch (e) {
-          console.log(e);
         }
       }
+      dispatch(getEvents());
     }
-
-    // const fetchData = {};
-    // isEdit && (fetchData._id = eventId);
-    // fetchData.eventName = anniversary;
-    // fetchData.date = date;
-
-    // if (window.confirm(`기념일을 ${isEdit ? '수정' : '등록'}하시겠습니까?`)) {
-    //   await axios({
-    //     url: `http://${API}/anniversary/${isEdit ? 'edit' : 'write'}`,
-    //     method: 'post',
-    //     data: fetchData,
-    //     withCredentials: true,
-    //   }).then(
-    //     setAnniversary(''),
-    //     setDate(''),
-    //     setEventId(''),
-    //     setIsEdit(false)
-    //   );
-    // }
-    // getUserEvent();
   };
 
-  const deleteEvent = async event => {
+  const deleteEvent = event => {
     if (window.confirm('기념일을 삭제하시겠습니까?')) {
       try {
-        await removeEvent(event.target.id);
+        removeEvent(event.target.id);
       } catch (e) {
         console.log(e);
       } finally {
-        getUserEvent();
         alert('삭제되었습니다.');
       }
     }
+    dispatch(getEvents());
   };
 
   const editEventSet = event => {
-    const selected = eventData.filter(data => data._id === event.target.id);
+    const selected = eventsData.filter(data => data._id === event.target.id);
     setIsEdit(true);
     setEventId(selected[0]._id);
     setAnniversary(selected[0].eventName);
     setDate(selected[0].date.slice(0, 10));
   };
 
+  if (eventsError || usersError) {
+    return <>Error: {eventsError || usersError}</>;
+  }
+
   return (
     <>
-      {isLoading ? (
+      {eventsLoading && usersLoading ? (
         <Loading />
       ) : (
         <>
-          <Nav coupleData={coupleInfo} />
+          <Nav coupleData={usersData} />
           <AnniversaryWrap>
             <ContentsWrap>
               <MainTitle>기억하고 싶은 기념일을 등록해 주세요</MainTitle>
@@ -167,8 +143,8 @@ const Anniversary = () => {
                   {invitorBirth && (
                     <tr>
                       <DefaultEvent>
-                        {coupleInfo.invitor_nickname
-                          ? coupleInfo.invitor_nickname
+                        {usersData.invitor_nickname
+                          ? usersData.invitor_nickname
                           : '사용자1'}{' '}
                         생일
                       </DefaultEvent>
@@ -179,8 +155,8 @@ const Anniversary = () => {
                   {inviteeBirth && (
                     <tr>
                       <DefaultEvent>
-                        {coupleInfo.invitee_nickname
-                          ? coupleInfo.invitee_nickname
+                        {usersData.invitee_nickname
+                          ? usersData.invitee_nickname
                           : '사용자2'}{' '}
                         생일
                       </DefaultEvent>
@@ -195,8 +171,8 @@ const Anniversary = () => {
                       <DefaultEvent></DefaultEvent>
                     </tr>
                   )}
-                  {eventData &&
-                    eventData.map(data => {
+                  {eventsData &&
+                    eventsData.map(data => {
                       return (
                         <TableRow key={data._id}>
                           <TableData>{data.eventName}</TableData>
