@@ -1,30 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { buttonSet, flexSet } from '../../styles/mixin';
+import { getRecords } from '../../modules/records';
+import { API } from '../../api';
 
 const Record = props => {
   const {
     recordId,
     isOpen,
-    time,
-    setTime,
-    costCategory,
-    setCostCategory,
-    costContent,
-    setCostContent,
-    cost,
-    setCost,
-    picture,
-    setPicture,
-    story,
-    setStory,
-    notice,
-    handleData,
-    submitRecord,
-    close,
+    setIsRecordOpen,
+    setRecordId,
     placeName,
+    setPlaceName,
     convertedDate,
+    lat,
+    long,
+    setSearchTerm,
+    setLat,
+    setLong,
   } = props;
+  const [timeInput, setTimeInput] = useState();
+  const [categoryInput, setCategoryInput] = useState();
+  const [costContentInput, setCostContentInput] = useState();
+  const [costInput, setCostInput] = useState();
+  const [pictureInput, setPictureInput] = useState();
+  const [storyInput, setStoryInput] = useState(null);
+  const [notice, setNotice] = useState(false);
+
+  const { recordDetailData, recordDetailLoading, recoredDetailError } =
+    useSelector(state => state.recordForm);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const { place, time, category, expenseInfo, expense, story } =
+      recordDetailData;
+    setTimeInput(time);
+    place && setPlaceName(place);
+    setCategoryInput(category);
+    setCostContentInput(expenseInfo);
+    setCostInput(expense);
+    story !== 'null' && setStoryInput(story);
+  }, [recordDetailData]);
 
   const showDate = () => {
     const year = convertedDate.substring(0, 4);
@@ -35,6 +53,84 @@ const Record = props => {
       date[0] === '0' ? date.substr(1, 1) : date
     }일`;
   };
+
+  const handleData = (event, setData, isCost) => {
+    const { value } = event.target;
+    isCost
+      ? setData(value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '1'))
+      : setData(value);
+  };
+
+  const submitRecord = e => {
+    e.preventDefault();
+
+    const conditions =
+      timeInput && categoryInput && costContentInput && costInput;
+
+    conditions
+      ? window.confirm(`기록을 ${recordId ? '수정' : '입력'} 하시겠습니까?`) &&
+        enrollRecord()
+      : setNotice(true);
+  };
+
+  const enrollRecord = async () => {
+    const recordData = new FormData();
+
+    if (recordId) {
+      recordData.append('_id', recordId);
+      pictureInput && recordData.append('datePhoto', pictureInput);
+    } else {
+      recordData.append('place', placeName);
+      recordData.append('datePhoto', pictureInput);
+      recordData.append('date', convertedDate);
+      recordData.append('longitude', long);
+      recordData.append('latitude', lat);
+    }
+
+    recordData.append('time', timeInput);
+    recordData.append('category', categoryInput);
+    recordData.append('expenseInfo', costContentInput);
+    recordData.append('expense', costInput);
+    recordData.append('story', storyInput);
+
+    axios({
+      url: `http://${API}/post/${recordId ? 'edit' : 'write'}`,
+      method: 'post',
+      data: recordData,
+      withCredentials: true,
+    })
+      .then(() => {
+        alert(`정보 ${recordId ? '수정' : '입력'}이 완료되었습니다`);
+        dispatch(getRecords(convertedDate));
+        closeRecord();
+      })
+      .catch(error => console.log(error));
+  };
+
+  const cancleRecord = () => {
+    if (window.confirm(`${recordId ? '수정' : '작성'}을 취소하시겠습니까?`)) {
+      closeRecord();
+    }
+  };
+
+  const closeRecord = () => {
+    setIsRecordOpen(false);
+    setRecordId();
+    setTimeInput();
+    setCategoryInput();
+    setCostContentInput();
+    setCostInput();
+    setPictureInput();
+    setStoryInput();
+    recordId && setRecordId();
+    setNotice(false);
+    setPlaceName('');
+    setSearchTerm('');
+    setLat();
+    setLong();
+  };
+
+  if (recoredDetailError) <div>Error: {recoredDetailError}</div>;
 
   return (
     <>
@@ -52,8 +148,8 @@ const Record = props => {
                 </CategoryTitle>
                 <TimeInput
                   type="time"
-                  value={time}
-                  onChange={e => handleData(e, setTime)}
+                  value={timeInput}
+                  onChange={e => handleData(e, setTimeInput)}
                 ></TimeInput>
               </ListWrap>
               <ListWrap>
@@ -62,8 +158,8 @@ const Record = props => {
                 </CategoryTitle>
                 <CostWrap>
                   <OptionSelect
-                    value={costCategory}
-                    onChange={e => handleData(e, setCostCategory)}
+                    value={categoryInput}
+                    onChange={e => handleData(e, setCategoryInput)}
                   >
                     <option value="">항목선택</option>
                     <option value="1">식비</option>
@@ -74,15 +170,15 @@ const Record = props => {
                   <CostTextInput
                     type="text"
                     placeholder="내용입력"
-                    value={costContent}
-                    onChange={e => handleData(e, setCostContent)}
+                    value={costContentInput}
+                    onChange={e => handleData(e, setCostContentInput)}
                   />
                   <MoneyInputWrap>
                     <MoneyInput
                       type="text"
                       placeholder="금액입력"
-                      value={cost}
-                      onChange={e => handleData(e, setCost, true)}
+                      value={costInput}
+                      onChange={e => handleData(e, setCostInput, true)}
                     />
                     <WonText>원</WonText>
                   </MoneyInputWrap>
@@ -96,10 +192,10 @@ const Record = props => {
                     id="picture"
                     type="file"
                     accept="image/*"
-                    onChange={e => setPicture(e.target.files[0])}
+                    onChange={e => setPictureInput(e.target.files[0])}
                   />
-                  <PictureName className={picture && 'pictureNameOn'}>
-                    {picture && picture.name}
+                  <PictureName className={pictureInput ? 'pictureNameOn' : ''}>
+                    {pictureInput && pictureInput.name}
                   </PictureName>
                 </PictureWrap>
               </ListWrap>
@@ -109,8 +205,8 @@ const Record = props => {
                   rows="5"
                   cols="30"
                   placeholder="내용을 입력하세요"
-                  value={story}
-                  onChange={e => handleData(e, setStory)}
+                  value={storyInput}
+                  onChange={e => handleData(e, setStoryInput)}
                 />
               </ListWrap>
               <Notification className={notice ? 'noticeOn' : ''}>
@@ -122,7 +218,7 @@ const Record = props => {
                 ) : (
                   <EnrollButton type="submit">수정</EnrollButton>
                 )}
-                <CancleButton onClick={close}>취소</CancleButton>
+                <CancleButton onClick={() => cancleRecord()}>취소</CancleButton>
               </div>
             </form>
           </ContentsWrap>
@@ -154,12 +250,14 @@ const ContentsWrap = styled.div`
 
 const MainTitle = styled.div`
   margin-bottom: 30px;
+  font-size: 14px;
 `;
 
 const ListWrap = styled.div`
   ${flexSet('row', 'flex-start', 'flex-start')}
   margin-bottom: 15px;
 `;
+
 const CategoryTitle = styled.div`
   width: 50px;
   padding-top: 3px;

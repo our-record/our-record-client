@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { getUsersInfo } from '../../modules/users';
 import LinkCopy from '../../components/Information/LinkCopy';
 import styled from 'styled-components';
 import Loading from '../../components/Common/Loading';
@@ -23,6 +25,9 @@ const Information = () => {
   const isInvitor = location.search.length !== 0;
   const isEdit = location.pathname === '/information_edit';
 
+  const { usersData } = useSelector(state => state.users);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     let now = new Date();
     let year = now.getFullYear();
@@ -34,23 +39,24 @@ const Information = () => {
 
     setToday(`${year}-${month}-${date}`);
 
-    isEdit &&
-      axios({
-        url: `http://${API}/user/register-info`,
-        withCredentials: true,
-      }).then(res => {
-        const { data } = res;
-        setCoupleId(data._id);
-        setNickName(data.invitor_nickname);
-        setInvitedNickName(data.invitee_nickname);
-
-        data.dday && setHangoutDate(data.dday.substring(0, 10));
-        data.invitor_birth && setBirthDay(data.invitor_birth.substring(0, 10));
-        data.invitee_birth &&
-          setInvitedBirthday(data.invitee_birth.substring(0, 10));
-        setIsLoading(false);
-      });
+    isEdit && dispatch(getUsersInfo());
   }, []);
+
+  useEffect(() => {
+    setUsersData(usersData);
+  }, [usersData]);
+
+  const setUsersData = data => {
+    setCoupleId(data._id);
+    setNickName(data.invitor_nickname);
+    setInvitedNickName(data.invitee_nickname);
+
+    data.dday && setHangoutDate(data.dday.substring(0, 10));
+    data.invitor_birth && setBirthDay(data.invitor_birth.substring(0, 10));
+    data.invitee_birth &&
+      setInvitedBirthday(data.invitee_birth.substring(0, 10));
+    setIsLoading(false);
+  };
 
   const handleInformation = (event, setData, validation) => {
     const { value } = event.target;

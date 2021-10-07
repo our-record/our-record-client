@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useSelector, useDispatch } from 'react-redux';
 import Record from '../../components/Record/Record';
 import Story from '../../components/Story/Story';
 import SearchPlaceInput from '../../components/Main/Map/SearchPlaceInput';
@@ -17,148 +17,57 @@ import {
   flexSet,
 } from '../../styles/mixin';
 import { COST_CATEGORY } from '../../config';
-import {
-  API,
-  getMainData,
-  removeRecord,
-  removeAllRecord,
-  getDailyRecord,
-} from '../../api';
+import { removeRecord, removeAllRecord } from '../../api';
 import { Link } from 'react-router-dom';
+import { getUsersInfo } from '../../modules/users';
+import { getRecords, deleteAllRecords } from '../../modules/records';
+import { getRecordDetail } from '../../modules/recordForm';
 
 const Main = () => {
   const [isRecordOpen, setIsRecordOpen] = useState(false);
-  const [isRecordEditOpen, setIsRecordEditOpen] = useState(false);
   const [recordId, setRecordId] = useState();
-  const [time, setTime] = useState();
-  const [costCategory, setCostCategory] = useState();
-  const [costContent, setCostContent] = useState();
-  const [cost, setCost] = useState();
-  const [picture, setPicture] = useState();
-  const [story, setStory] = useState(null);
   const [totalCost, setTotalCost] = useState(0);
-  const [notice, setNotice] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [convertedDate, setConvertedDate] = useState(new Date());
   const [placeName, setPlaceName] = useState('');
   const [searchTerm, setSearchTerm] = useState();
   const [long, setLong] = useState();
   const [lat, setLat] = useState();
-  const [dailyRecordData, setDailyRecordData] = useState([]);
-  const [coupleData, setCoupleData] = useState();
-  const [isLoading, setIsLoading] = useState(true);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [storyData, setStoryData] = useState();
   const [dDay, setDDay] = useState();
+
+  const { usersData, usersLoading, usersError } = useSelector(
+    state => state.users
+  );
+  const { recordsData, recordsLoading, recordsError } = useSelector(
+    state => state.records
+  );
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const year = calendarDate.getFullYear();
     const month = `0${calendarDate.getMonth() + 1}`.slice(-2);
     const date = `0${calendarDate.getDate()}`.slice(-2);
     setConvertedDate(`${year}-${month}-${date}`);
+    dispatch(getUsersInfo());
+    dispatch(getRecords(convertedDate));
     setSearchTerm('');
-    showRecord(convertedDate);
   }, [calendarDate, convertedDate]);
 
   useEffect(() => {
-    calculateTotalCost(dailyRecordData);
-  }, [dailyRecordData]);
+    calcDday(usersData.dday);
+  }, [usersData]);
 
-  const showRecord = async convertedDate => {
-    try {
-      const { data } = await getMainData(convertedDate);
+  useEffect(() => {
+    calculateTotalCost(recordsData);
+  }, [recordsData]);
 
-      const coupleDate = new Date(data[1].dday);
-      const today = new Date();
-      const calcDate = today.getTime() - coupleDate.getTime();
-
-      setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
-      setCoupleData(data[1]);
-      setDailyRecordData(data[0] ? data[0] : []);
-    } catch (e) {
-      console.log(`error: ${e}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleData = (event, setData, isCost) => {
-    const { value } = event.target;
-    isCost
-      ? setData(value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '1'))
-      : setData(value);
-  };
-
-  const submitRecord = e => {
-    e.preventDefault();
-
-    const conditions = time && costContent && cost && costCategory;
-
-    conditions
-      ? window.confirm(`기록을 ${recordId ? '수정' : '입력'} 하시겠습니까?`) &&
-        enrollRecord()
-      : setNotice(true);
-  };
-
-  const enrollRecord = async () => {
-    const recordData = new FormData();
-
-    if (recordId) {
-      recordData.append('_id', recordId);
-      picture && recordData.append('datePhoto', picture);
-    } else {
-      recordData.append('place', placeName);
-      recordData.append('datePhoto', picture);
-      recordData.append('date', convertedDate);
-      recordData.append('longitude', long);
-      recordData.append('latitude', lat);
-    }
-
-    recordData.append('time', time);
-    recordData.append('category', costCategory);
-    recordData.append('expenseInfo', costContent);
-    recordData.append('expense', cost);
-    recordData.append('story', story);
-
-    axios({
-      url: `http://${API}/post/${recordId ? 'edit' : 'write'}`,
-      method: 'post',
-      data: recordData,
-      withCredentials: true,
-    })
-      .then(res => {
-        alert(`정보 ${recordId ? '수정' : '입력'}이 완료되었습니다`);
-        getRecord();
-        closeRecord();
-      })
-      .catch(error => console.log(error));
-  };
-
-  const cancleRecord = () => {
-    if (
-      window.confirm(
-        `${isRecordEditOpen ? '수정' : '작성'}을 취소하시겠습니까?`
-      )
-    ) {
-      closeRecord();
-    }
-  };
-
-  const closeRecord = () => {
-    setIsRecordOpen(false);
-    setIsRecordEditOpen(false);
-    setPlaceName('');
-    setSearchTerm('');
-    setLat();
-    setLong();
-    setTime();
-    setCostCategory();
-    setCostContent();
-    setCost();
-    setPicture();
-    setStory();
-    setRecordId();
-    setNotice(false);
+  const calcDday = dday => {
+    const coupleDate = new Date(dday);
+    const today = new Date();
+    const calcDate = today.getTime() - coupleDate.getTime();
+    setDDay(Math.floor(calcDate / (1000 * 60 * 60 * 24)) - 1);
   };
 
   const calculateTotalCost = data => {
@@ -173,24 +82,19 @@ const Main = () => {
   const deleteRecord = id => {
     if (window.confirm('기록을 삭제하시겠습니까?')) {
       removeRecord(convertedDate, id);
-      getRecord();
+      dispatch(getRecords(convertedDate));
     }
   };
 
   const deleteAllRecord = () => {
     if (window.confirm('기록 전체를 삭제하시겠습니까?')) {
       removeAllRecord(convertedDate);
-      setDailyRecordData([]);
+      dispatch(deleteAllRecords());
     }
   };
 
-  const getRecord = async () => {
-    const { data } = await getDailyRecord(convertedDate);
-    setDailyRecordData(data);
-  };
-
   const openStory = event => {
-    setStoryData(dailyRecordData.filter(data => data._id === event.target.id));
+    setStoryData(recordsData.filter(data => data._id === event.target.id));
     setIsStoryOpen(true);
   };
 
@@ -198,54 +102,49 @@ const Main = () => {
     setIsStoryOpen(false);
   };
 
-  const editRecord = event => {
-    const selectedRecord = dailyRecordData.filter(
-      data => data._id === event.target.id
-    )[0];
-
-    setRecordId(selectedRecord._id);
-    setTime(selectedRecord.time);
-    setCostCategory(selectedRecord.category);
-    setCostContent(selectedRecord.expenseInfo);
-    setCost(selectedRecord.expense);
-    selectedRecord.story && setStory(selectedRecord.story);
-    selectedRecord.place && setPlaceName(selectedRecord.place);
-    setIsRecordEditOpen(true);
+  const editRecordOpen = event => {
+    if (window.confirm('기록을 수정하시겠습니까?')) {
+      setRecordId(event.target.id);
+      dispatch(getRecordDetail(event.target.id));
+      setIsRecordOpen(true);
+    }
   };
+
+  if (usersError || recordsError) {
+    return <div>Error: {usersError || recordsError}</div>;
+  }
 
   return (
     <>
-      {isLoading ? (
+      {usersLoading && recordsLoading ? (
         <Loading />
       ) : (
         <MainWrap>
-          <Nav coupleData={coupleData} />
+          <Nav />
           <BodyWrap>
             <SideWrap>
               <ProfileImage
                 alt="profile"
                 src={`${
-                  coupleData && coupleData.couple_img
-                    ? coupleData.couple_img
+                  usersData && usersData.couple_img
+                    ? usersData.couple_img
                     : '/icon/couple.png'
                 }`}
               />
               <NickNameWrap>
-                {coupleData && coupleData.invitor_nickname ? (
-                  <NickName>{coupleData.invitor_nickname}</NickName>
+                {usersData && usersData.invitor_nickname ? (
+                  <NickName>{usersData.invitor_nickname}</NickName>
                 ) : (
                   <NoNickName> 등록해 주세요</NoNickName>
                 )}
                 <HeartIcon alt="heart" src="/icon/heart.png" />{' '}
-                {coupleData && coupleData.invitee_nickname ? (
-                  <NickName>{coupleData.invitee_nickname}</NickName>
+                {usersData && usersData.invitee_nickname ? (
+                  <NickName>{usersData.invitee_nickname}</NickName>
                 ) : (
                   <NoNickName> 등록해 주세요</NoNickName>
                 )}
               </NickNameWrap>
-              <DDay>
-                {coupleData && coupleData.dday ? `D + ${dDay}일` : ''}
-              </DDay>
+              <DDay>{usersData && usersData.dday ? `D + ${dDay}일` : ''}</DDay>
               <RecordCalendar>
                 <Calendar
                   value={calendarDate}
@@ -258,24 +157,15 @@ const Main = () => {
               </RecordButton>
               <Record
                 isOpen={isRecordOpen}
-                time={time}
-                setTime={setTime}
-                costCategory={costCategory}
-                setCostCategory={setCostCategory}
-                costContent={costContent}
-                setCostContent={setCostContent}
-                cost={cost}
-                setCost={setCost}
-                picture={picture}
-                setPicture={setPicture}
-                story={story}
-                setStory={setStory}
-                notice={notice}
-                handleData={handleData}
-                submitRecord={submitRecord}
-                close={cancleRecord}
+                setIsRecordOpen={setIsRecordOpen}
                 placeName={placeName}
+                setPlaceName={setPlaceName}
                 convertedDate={convertedDate}
+                lat={lat}
+                long={long}
+                setSearchTerm={setSearchTerm}
+                setLat={setLat}
+                setLong={setLong}
               />
               <Link to="/chart">
                 <StatisticsButton>이 달의 통계</StatisticsButton>
@@ -289,10 +179,10 @@ const Main = () => {
                   setPlaceName={setPlaceName}
                   setLong={setLong}
                   setLat={setLat}
-                  recordMarkers={dailyRecordData}
+                  recordMarkers={recordsData}
                 />
               </MapWrap>
-              {dailyRecordData.length !== 0 ? (
+              {recordsData.length !== 0 ? (
                 <ListWrap>
                   <ListTitle>그 날의 기록</ListTitle>
                   <ListTable>
@@ -308,7 +198,7 @@ const Main = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {dailyRecordData.map(data => {
+                      {recordsData.map(data => {
                         return (
                           <tr key={data._id}>
                             <TableData>
@@ -354,29 +244,21 @@ const Main = () => {
                                 id={data._id}
                                 alt="edit"
                                 src="/icon/edit.png"
-                                onClick={e => editRecord(e)}
+                                onClick={e => editRecordOpen(e)}
                               />
                               <Record
-                                isOpen={isRecordEditOpen}
+                                isOpen={isRecordOpen}
+                                setIsRecordOpen={setIsRecordOpen}
                                 recordId={recordId}
-                                time={time}
-                                setTime={setTime}
-                                costCategory={costCategory}
-                                setCostCategory={setCostCategory}
-                                costContent={costContent}
-                                setCostContent={setCostContent}
-                                cost={cost}
-                                setCost={setCost}
-                                picture={picture}
-                                setPicture={setPicture}
-                                story={story}
-                                setStory={setStory}
-                                notice={notice}
-                                handleData={handleData}
-                                submitRecord={submitRecord}
-                                close={cancleRecord}
+                                setRecordId={setRecordId}
+                                lat={lat}
+                                long={long}
                                 placeName={placeName}
+                                setPlaceName={setPlaceName}
                                 convertedDate={convertedDate}
+                                setSearchTerm={setSearchTerm}
+                                setLat={setLat}
+                                setLong={setLong}
                               />
                             </TableData>
                           </tr>
