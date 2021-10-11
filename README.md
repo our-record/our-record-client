@@ -43,7 +43,7 @@
 
 <br>
 
-### 1. 회원가입 / 로그인 페이지 (신미영)
+### 1. 회원가입 / 로그인 페이지
 
 ![login](https://user-images.githubusercontent.com/76767572/133452020-01e1d17f-cb91-4daf-93ae-c6669e0cc2a9.gif)
 
@@ -51,7 +51,7 @@
 
 <br>
 
-### 2. 사용자 정보 등록 / 수정 페이지 (신미영)
+### 2. 사용자 정보 등록 / 수정 페이지
 
 ![information](https://user-images.githubusercontent.com/76767572/133456548-5fa146fd-5511-404a-8b4a-052c37f46ccb.gif)
 
@@ -63,7 +63,7 @@
 
 <br>
 
-### 3. 메인 페이지 (신미영)
+### 3. 메인 페이지
 
 ![메인페이지](https://user-images.githubusercontent.com/76767572/133556201-a0a1aeb5-2545-4c2a-bc61-bb19374fd08d.png)
 
@@ -74,7 +74,7 @@
 
 <br>
 
-### 4. 기록 등록 / 수정 모달 (신미영)
+### 4. 기록 등록 / 수정 모달
 
 ![](public/images/readme/record.gif)
 
@@ -85,7 +85,7 @@
 
 <br>
 
-### 5. 스토리 보기 모달 (신미영)
+### 5. 스토리 보기 모달
 
 ![story](https://user-images.githubusercontent.com/76767572/133456226-66ea720f-676b-4146-bf49-223c4f3cfc83.gif)
 
@@ -94,22 +94,13 @@
 
 <br>
 
-### 6. 기념일 등록 페이지 (신미영)
+### 6. 기념일 등록 페이지
 
 ![anniversary](https://user-images.githubusercontent.com/76767572/133457866-e2ae725d-6b89-4954-aefb-175b5533f481.gif)
 
 - 페이지 로드 시 백엔드로부터 사용자 정보 fetch 받아 사용자 다음 생일, n주년 노출 기능 구현
 - 사용자가 등록한 기념일 데이터 백엔드로 전달하여 저장 후 table 노출 되도록 기능 구현
 - 등록한 기념일 수정 및 삭제 기능 구현
-
-<br>
-
-### 7. 통계 페이지 (박준우)
-
-![statistics](https://user-images.githubusercontent.com/76767572/133458630-6edde220-fdea-491a-b876-245af64714a9.gif)
-
-- react-chartjs-2 라이브러리를 활용한 통계 페이지 구현
-- 최근 7일, 월간 차트 구현
 
 <br><br>
 
