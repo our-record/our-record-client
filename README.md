@@ -37,9 +37,10 @@
 
 - React 기반의 웹 앱 제작
 - CRA를 사용한 초기 세팅
+- Redux, redux-thunk를 사용한 데이터 전역 상태 관리
 - styled-component를 사용한 스타일링
 - axios instance를 생성해 백엔드 api 통신
-- 상단 Navigation 컴포넌트 및 로딩 컴포넌트 제작
+- 공통으로 사용되는 상단 Navigation 컴포넌트 및 로딩 컴포넌트 제작
 
 <br>
 
